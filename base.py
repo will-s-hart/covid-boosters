@@ -74,19 +74,44 @@ class HeterogeneousRenewalModel:
                 infectiousness_scaled_incidence_vec, infectiousness_scaling * incidence
             )
             if incidence >= incidence_cutoff:
-                outbreak_cutoff_bool = True
+                outbreak_cutoff_indicator = True
                 break
             if time - time_start > generation_time_max and np.all(
                 incidence_vec[-1 : -generation_time_max - 1 : -1] == 0
             ):
-                outbreak_cutoff_bool = False
+                outbreak_cutoff_indicator = False
                 break
         output = {
             "time_vec": time_vec,
             "incidence_vec": incidence_vec,
-            "outbreak_cutoff_bool": outbreak_cutoff_bool,
+            "outbreak_cutoff_indicator": outbreak_cutoff_indicator,
         }
         return output
+
+    def simulated_outbreak_risk(
+        self,
+        time_vec,
+        incidence_cutoff=1000,
+        no_simulations=1000,
+        rng=None,
+        rng_seed=None,
+    ):
+        if rng is None:
+            rng = np.random.default_rng(rng_seed)
+        outbreak_risk_vec = np.zeros(len(time_vec))
+        for i, time in enumerate(time_vec):
+            major_outbreak_indicator_vec = np.zeros(no_simulations, dtype=bool)
+            for j in range(no_simulations):
+                output = self.simulate(
+                    time_start=time,
+                    incidence_start=1,
+                    incidence_cutoff=incidence_cutoff,
+                    rng=rng,
+                )
+                major_outbreak_indicator_vec[j] = output["outbreak_cutoff_indicator"]
+            outbreak_risk = major_outbreak_indicator_vec.mean()
+            outbreak_risk_vec[i] = outbreak_risk
+        return outbreak_risk_vec
 
 
 class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
@@ -96,10 +121,14 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
 
     def __init__(
         self,
-        reproduction_no_func,
+        time_vec,
+        reproduction_no_vec,
         generation_time_dist,
         dispersion_param=1.0,
-        period=365,
     ):
+        def reproduction_no_func(time):
+            return np.interp(time, time_vec, reproduction_no_vec, period=len(time_vec))
+
         super().__init__(reproduction_no_func, generation_time_dist, dispersion_param)
-        self._period = period
+        self._time_vec = time_vec
+        self._reproduction_no_vec = reproduction_no_vec
