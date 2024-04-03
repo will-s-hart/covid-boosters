@@ -3,6 +3,7 @@ Base module defining main classes and methods.
 """
 
 import numpy as np
+from scipy.optimize import newton
 from scipy.stats import gamma, poisson
 
 
@@ -39,7 +40,7 @@ class HeterogeneousRenewalModel:
         time = time_start
         incidence = incidence_start
         infectiousness_scaling = gamma.rvs(
-            a=incidence_start * dispersion_param,
+            a=incidence * dispersion_param,
             scale=1 / dispersion_param,
             random_state=rng,
         )
@@ -113,6 +114,34 @@ class HeterogeneousRenewalModel:
             outbreak_risk_vec[i] = outbreak_risk
         return outbreak_risk_vec
 
+    def instantaneous_outbreak_risk(
+        self,
+        time_vec,
+    ):
+        reproduction_no_func = self._reproduction_no_func
+        dispersion_param = self._dispersion_param
+        reproduction_no_vec = reproduction_no_func(time_vec)
+        multiplying_matrix = np.diag(reproduction_no_vec)
+
+        def zero_func(outbreak_risk_vec):
+            return (
+                1
+                - outbreak_risk_vec
+                - (
+                    1
+                    + np.matmul(multiplying_matrix, outbreak_risk_vec)
+                    / dispersion_param
+                )
+                ** (-dispersion_param)
+            )
+
+        outbreak_risk_vec_init = 1 - 1 / reproduction_no_vec
+        outbreak_risk_vec_init = outbreak_risk_vec_init + zero_func(
+            outbreak_risk_vec_init
+        )
+        outbreak_risk_vec = newton(zero_func, x0=outbreak_risk_vec_init)
+        return outbreak_risk_vec
+
 
 class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
     """
@@ -131,4 +160,59 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
 
         super().__init__(reproduction_no_func, generation_time_dist, dispersion_param)
         self._time_vec = time_vec
+        self._period = len(time_vec)
         self._reproduction_no_vec = reproduction_no_vec
+
+    def case_outbreak_risk(self, time_vec, **kwargs):
+        time_vec_all = self._time_vec
+        period = self._period
+        outbreak_risk_vec_all = self._case_outbreak_risk_all(**kwargs)
+        outbreak_risk_vec = np.interp(
+            time_vec, time_vec_all, outbreak_risk_vec_all, period=period
+        )
+        return outbreak_risk_vec
+
+    def _case_outbreak_risk_all(self, **kwargs):
+        reproduction_no_vec = self._reproduction_no_vec
+        generation_time_dist = self._generation_time_dist
+        dispersion_param = self._dispersion_param
+        period = self._period
+
+        if self._generation_time_max > period:
+            raise NotImplementedError(
+                "Currently, only a maximum generation time less "
+                "than the period is supported"
+            )
+        generation_time_pmf_vec_periodic = generation_time_dist.pmf(
+            np.arange(1, period + 1)
+        )
+        multiplying_matrix = np.zeros((period, period))
+        for diagonal in range(-period + 1, period):
+            multiplying_matrix = multiplying_matrix + np.diag(
+                np.repeat(
+                    generation_time_pmf_vec_periodic[diagonal - 1],
+                    period - abs(diagonal),
+                ),
+                diagonal,
+            )
+        multiplying_matrix = np.matmul(multiplying_matrix, np.diag(reproduction_no_vec))
+
+        def zero_func(outbreak_risk_vec):
+            return (
+                1
+                - outbreak_risk_vec
+                - (
+                    1
+                    + np.matmul(multiplying_matrix, outbreak_risk_vec)
+                    / dispersion_param
+                )
+                ** (-dispersion_param)
+            )
+
+        outbreak_risk_vec_init = 1 - 1 / reproduction_no_vec
+        for _ in range(50):
+            outbreak_risk_vec_init = outbreak_risk_vec_init + zero_func(
+                outbreak_risk_vec_init
+            )
+        outbreak_risk_vec = newton(zero_func, x0=outbreak_risk_vec_init, **kwargs)
+        return outbreak_risk_vec
