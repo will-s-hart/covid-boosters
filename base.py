@@ -39,12 +39,11 @@ class HeterogeneousRenewalModel:
         dispersion_param = self._dispersion_param
         time = time_start
         incidence = incidence_start
-        infectiousness_scaling = gamma.rvs(
+        infectiousness_scaled_incidence = gamma.rvs(
             a=incidence * dispersion_param,
             scale=1 / dispersion_param,
             random_state=rng,
         )
-        infectiousness_scaled_incidence = infectiousness_scaling * incidence
         time_vec = np.array([time])
         incidence_vec = np.array([incidence])
         infectiousness_scaled_incidence_vec = np.array(
@@ -62,17 +61,17 @@ class HeterogeneousRenewalModel:
             )
             incidence = poisson.rvs(mu=expected_incidence, random_state=rng)
             if incidence > 0:
-                infectiousness_scaling = gamma.rvs(
+                infectiousness_scaled_incidence = gamma.rvs(
                     a=incidence * dispersion_param,
                     scale=1 / dispersion_param,
                     random_state=rng,
                 )
             else:
-                infectiousness_scaling = 0
+                infectiousness_scaled_incidence = 0
             time_vec = np.append(time_vec, time)
             incidence_vec = np.append(incidence_vec, incidence)
             infectiousness_scaled_incidence_vec = np.append(
-                infectiousness_scaled_incidence_vec, infectiousness_scaling * incidence
+                infectiousness_scaled_incidence_vec, infectiousness_scaled_incidence
             )
             if incidence >= incidence_cutoff:
                 outbreak_cutoff_indicator = True
