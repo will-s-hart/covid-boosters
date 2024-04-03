@@ -3,8 +3,131 @@ Base module defining main classes and methods.
 """
 
 import numpy as np
+from scipy.integrate import solve_ivp
 from scipy.optimize import newton
 from scipy.stats import gamma, poisson
+
+
+class AntibodyModel:
+    """
+    Class for modeling antibody dynamics following a single vaccination dose.
+    """
+
+    def __init__(self, params):
+        self._params = params
+
+    def run(self, time_init, antibody_init, time_vec, time_prev_vaccination=None):
+        params = self._params
+        log_mrna_dose = params["log_mrna_dose"]
+        mrna_decay_rate = params["mrna_decay_rate"]
+        delay_to_antibody_response = params["delay_to_antibody_response"]
+        max_antibody_production_rate = params["max_antibody_production_rate"]
+        mrna_response_steepness = params["mrna_response_steepness"]
+        half_maximal_response_log_mrna = params["half_maximal_response_log_mrna"]
+        antibody_decay_rate = params["antibody_decay_rate"]
+
+        def ode_func(t, y):
+            antibody = y[0]
+            if t - time_init < delay_to_antibody_response:
+                if time_prev_vaccination is not None:
+                    log_mrna = log_mrna_dose - mrna_decay_rate * (
+                        t - time_prev_vaccination
+                    )
+                else:
+                    log_mrna = -np.inf
+            else:
+                log_mrna = log_mrna_dose - mrna_decay_rate * (t - time_init)
+            antibody_production_rate = max_antibody_production_rate * (
+                1
+                / (
+                    1
+                    + np.exp(
+                        -mrna_response_steepness
+                        * (log_mrna - half_maximal_response_log_mrna)
+                    )
+                )
+            )
+            d_antibody_dt = antibody_production_rate - antibody_decay_rate * antibody
+            return [d_antibody_dt]
+
+        ode_solution = solve_ivp(
+            ode_func,
+            t_span=(time_init, time_vec[-1]),
+            y0=[antibody_init],
+            t_eval=time_vec,
+        )
+
+        antibody_vec = ode_solution.y[0]
+        return antibody_vec
+
+
+class IndividualSusceptibilityModel:
+    """
+    Class for calculating individual susceptibility based on an antibody dynamics model.
+    """
+
+    def __init__(
+        self,
+        antibody_model_params,
+        susceptibility_func_params,
+        vaccination_times,
+    ):
+        self._antibody_model = AntibodyModel(antibody_model_params)
+        self._susceptibility_func_params = susceptibility_func_params
+        if vaccination_times is None:
+            vaccination_times = []
+        else:
+            vaccination_times = np.array(vaccination_times)
+        self._vaccination_times = vaccination_times
+
+    def susceptibility(self, time_vec):
+        susceptibility_func_params = self._susceptibility_func_params
+        antibody_response_steepness = susceptibility_func_params[
+            "antibody_response_steepness"
+        ]
+        half_protection_antibody = susceptibility_func_params[
+            "half_protection_antibody"
+        ]
+        antibody_vec = self.antibody_titers(time_vec)
+        susceptibility_vec = 1 / (
+            1 + (antibody_vec / half_protection_antibody) ** antibody_response_steepness
+        )
+        return susceptibility_vec
+
+    def antibody_titers(self, time_vec):
+        antibody_model = self._antibody_model
+        vaccination_times = self._vaccination_times
+        vaccination_times = vaccination_times[vaccination_times <= np.max(time_vec)]
+        antibody_vec = np.zeros(len(time_vec), dtype=float)
+        antibody_init_next = 0.0
+        for vaccination_index_current, vaccination_time_current in enumerate(
+            vaccination_times
+        ):
+            if vaccination_index_current > 0:
+                time_prev_vaccination = vaccination_times[vaccination_index_current - 1]
+            else:
+                time_prev_vaccination = None
+            if vaccination_index_current < len(vaccination_times) - 1:
+                vaccination_time_next = vaccination_times[vaccination_index_current + 1]
+            else:
+                vaccination_time_next = (
+                    max(vaccination_time_current, np.max(time_vec)) + 1
+                )  # arbitrary
+            current_indicator_vec = (time_vec >= vaccination_time_current) & (
+                time_vec < vaccination_time_next
+            )
+            time_vec_current = time_vec[current_indicator_vec]
+            antibody_init_current = antibody_init_next
+            antibody_vec_current_plus_init_next = antibody_model.run(
+                time_init=vaccination_time_current,
+                antibody_init=antibody_init_current,
+                time_vec=np.append(time_vec_current, vaccination_time_next),
+                time_prev_vaccination=time_prev_vaccination,
+            )
+            antibody_vec_current = antibody_vec_current_plus_init_next[:-1]
+            antibody_init_next = antibody_vec_current_plus_init_next[-1]
+            antibody_vec[current_indicator_vec] = antibody_vec_current
+        return antibody_vec
 
 
 class HeterogeneousRenewalModel:
