@@ -428,10 +428,6 @@ class HeterogeneousRenewalModel:
             )
 
         outbreak_risk_vec_init = np.ones(len(time_vec))
-        for _ in range(50):
-            outbreak_risk_vec_init = outbreak_risk_vec_init + zero_func(
-                outbreak_risk_vec_init
-            )
         outbreak_risk_vec = root(
             zero_func,
             x0=outbreak_risk_vec_init,
@@ -466,6 +462,17 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
         outbreak_risk_vec_all = self._case_outbreak_risk_all(**kwargs)
         outbreak_risk_vec = np.interp(
             time_vec, time_vec_all, outbreak_risk_vec_all, period=period
+        )
+        return outbreak_risk_vec
+
+    def simulated_outbreak_risk(self, time_vec, **kwargs):
+        period = self._period
+        time_vec_reduced = np.unique(time_vec % period)
+        outbreak_risk_vec_reduced = super().simulated_outbreak_risk(
+            time_vec_reduced, **kwargs
+        )
+        outbreak_risk_vec = np.interp(
+            time_vec, time_vec_reduced, outbreak_risk_vec_reduced, period=period
         )
         return outbreak_risk_vec
 
@@ -507,10 +514,6 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
             )
 
         outbreak_risk_vec_init = np.ones(period)
-        for _ in range(50):
-            outbreak_risk_vec_init = outbreak_risk_vec_init + zero_func(
-                outbreak_risk_vec_init
-            )
         outbreak_risk_vec = root(
             zero_func,
             x0=outbreak_risk_vec_init,
