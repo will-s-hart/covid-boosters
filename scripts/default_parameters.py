@@ -9,7 +9,7 @@ results_dir = Path(__file__).parents[1] / "results"
 
 def _get_default_parameters():
     period = 360
-    unvacc_rep_no_mean = 3
+    unvacc_rep_no_mean = 2
     unvacc_rep_no_prop_var = 0.25
     peak_transmission_time = 0
 
@@ -26,20 +26,29 @@ def _get_default_parameters():
     antibody_model_params_pop = pd.read_csv(
         results_dir / "antibody_model_params_pop.csv", index_col=0, header=None
     )[1].to_dict()
-    antibody_model_params_random_effects = pd.read_csv(
-        results_dir / "antibody_model_params_random_effects.csv",
-        index_col=0,
-        header=None,
-    )[1].to_dict()
+    # antibody_model_params_random_effects = pd.read_csv(
+    #     results_dir / "antibody_model_params_random_effects.csv",
+    #     index_col=0,
+    #     header=None,
+    # )[1].to_dict()
+    antibody_model_params_random_effects = {key: 0 for key in antibody_model_params_pop}
+
+    antibody_covalescent = 114.92
+    half_protection_neutralizing_ab = 0.2
+    omicron_reduction_factor = 22
+    vaccine_adaptation_factor = 1.61
 
     susceptibility_func_params = {
-        "antibody_response_steepness": 3 / np.log(10),
-        "half_protection_antibody": 114.92 * np.exp(0.2 * np.log(10)),
+        "antibody_response_steepness": np.exp(1.13) / np.log(10),
+        "half_protection_antibody": half_protection_neutralizing_ab
+        * antibody_covalescent
+        * (omicron_reduction_factor / vaccine_adaptation_factor),
     }
 
     vaccination_time_range = [270, 360]
-    proportion_vaccinated = 0.8
-    population_size = 1000
+    proportion_vaccinated = 0.5
+    # population_size = 1000
+    population_size = 1
 
     default_parameters = {
         "period": period,
