@@ -171,73 +171,7 @@ class PeriodicIndividualSusceptibilityModel(IndividualSusceptibilityModel):
         return antibody_vec
 
 
-class HomogeneousPopulationSusceptibilityModel:
-    """
-    Class for calculating population susceptibility based on an individual
-    susceptibility model.
-    """
-
-    def __init__(
-        self,
-        period,
-        vaccination_time_range,
-        proportion_vaccinated,
-        antibody_model_params,
-        susceptibility_func_params,
-    ):
-        if isinstance(vaccination_time_range, (int, float)):
-            vaccination_time_range = [
-                vaccination_time_range,
-                vaccination_time_range + 1,
-            ]
-        self._period = period
-        self._vaccination_time_range = vaccination_time_range
-        self._proportion_vaccinated = proportion_vaccinated
-        self._antibody_model_params = antibody_model_params
-        self._susceptibility_func_params = susceptibility_func_params
-
-    def susceptibility(self, time_vec, **kwargs):
-        period = self._period
-        time_vec_all = np.arange(period)
-        susceptibility_vec_all = self._susceptibility_all(**kwargs)
-        susceptibility_vec = np.interp(
-            time_vec, time_vec_all, susceptibility_vec_all, period=period
-        )
-        return susceptibility_vec
-
-    def _susceptibility_all(self, **kwargs):
-        period = self._period
-        vaccination_time_range = self._vaccination_time_range
-        proportion_vaccinated = self._proportion_vaccinated
-        antibody_model_params = self._antibody_model_params
-        susceptibility_func_params = self._susceptibility_func_params
-        time_vec_all = np.arange(period)
-        susceptibility_vec_all_0 = PeriodicIndividualSusceptibilityModel(
-            vaccination_times=0,
-            antibody_model_params=antibody_model_params,
-            susceptibility_func_params=susceptibility_func_params,
-            period=period,
-        ).susceptibility(time_vec_all, **kwargs)
-        shifted_time_mat = (
-            time_vec_all[:, np.newaxis]
-            - np.arange(vaccination_time_range[0], vaccination_time_range[1])[
-                :, np.newaxis
-            ].T
-        )
-        susceptibility_vec_all_vaccinated = np.mean(
-            np.interp(
-                shifted_time_mat, time_vec_all, susceptibility_vec_all_0, period=period
-            ),
-            axis=1,
-        )
-        susceptibility_vec_all = (
-            proportion_vaccinated * susceptibility_vec_all_vaccinated
-            + (1 - proportion_vaccinated)
-        )
-        return susceptibility_vec_all
-
-
-class HeterogeneousPopulationSusceptibilityModel:
+class PopulationSusceptibilityModel:
     """
     Class for simulating susceptibility under booster vaccination in a population with
     heterogeneous antibody dynamics.
@@ -249,12 +183,16 @@ class HeterogeneousPopulationSusceptibilityModel:
         vaccination_time_range,
         proportion_vaccinated,
         antibody_model_params_pop,
-        antibody_model_params_random_effects,
         susceptibility_func_params,
-        population_size,
+        antibody_model_params_random_effects=None,
+        population_size=1,
         rng=None,
         rng_seed=None,
     ):
+        if antibody_model_params_random_effects is None:
+            antibody_model_params_random_effects = {
+                param_name: 0 for param_name in antibody_model_params_pop
+            }
         if rng is None:
             rng = np.random.default_rng(rng_seed)
         if isinstance(vaccination_time_range, (int, float)):
@@ -277,26 +215,79 @@ class HeterogeneousPopulationSusceptibilityModel:
                 )
             antibody_model_params_by_indiv.append(antibody_model_params)
         self._antibody_model_params_by_indiv = antibody_model_params_by_indiv
+        self._susceptibility_vec_all_0 = None
+        self._susceptibility_vec_all_0_kwargs = None
 
     def susceptibility(self, time_vec, **kwargs):
         period = self._period
+        time_vec_all = np.arange(period)
+        susceptibility_vec_all = self._susceptibility_all(**kwargs)
+        susceptibility_vec = np.interp(
+            time_vec, time_vec_all, susceptibility_vec_all, period=period
+        )
+        return susceptibility_vec
+
+    def update_vaccination_params(
+        self, vaccination_time_range=None, proportion_vaccinated=None
+    ):
+        if vaccination_time_range is not None:
+            if isinstance(vaccination_time_range, (int, float)):
+                vaccination_time_range = [
+                    vaccination_time_range,
+                    vaccination_time_range + 1,
+                ]
+            self._vaccination_time_range = vaccination_time_range
+        if proportion_vaccinated is not None:
+            self._proportion_vaccinated = proportion_vaccinated
+
+    def _susceptibility_all(self, **kwargs):
+        period = self._period
         vaccination_time_range = self._vaccination_time_range
         proportion_vaccinated = self._proportion_vaccinated
+        time_vec_all = np.arange(period)
+        if (
+            self._susceptibility_vec_all_0 is None
+            or kwargs != self._susceptibility_vec_all_0_kwargs
+        ):
+            self._calculate_susceptibility_all_0(**kwargs)
+        susceptibility_vec_all_0 = self._susceptibility_vec_all_0
+        shifted_time_mat = (
+            time_vec_all[:, np.newaxis]
+            - np.arange(vaccination_time_range[0], vaccination_time_range[1])[
+                :, np.newaxis
+            ].T
+        )
+        susceptibility_vec_all_vaccinated = np.mean(
+            np.interp(
+                shifted_time_mat, time_vec_all, susceptibility_vec_all_0, period=period
+            ),
+            axis=1,
+        )
+        susceptibility_vec_all = (
+            proportion_vaccinated * susceptibility_vec_all_vaccinated
+            + (1 - proportion_vaccinated)
+        )
+        return susceptibility_vec_all
+
+    def _calculate_susceptibility_all_0(self, **kwargs):
+        # Get susceptibility assuming all individuals are vaccinated at time 0
+        period = self._period
         susceptibility_func_params = self._susceptibility_func_params
         antibody_model_params_by_indiv = self._antibody_model_params_by_indiv
         population_size = self._population_size
-        cumulative_susceptibility_vec = np.zeros(len(time_vec))
+        time_vec_all = np.arange(period)
+        cumulative_susceptibility_vec = np.zeros(len(time_vec_all))
         for antibody_model_params in antibody_model_params_by_indiv:
-            susceptibility_vec = HomogeneousPopulationSusceptibilityModel(
-                period=period,
-                vaccination_time_range=vaccination_time_range,
-                proportion_vaccinated=proportion_vaccinated,
+            susceptibility_vec = PeriodicIndividualSusceptibilityModel(
+                vaccination_times=0,
                 antibody_model_params=antibody_model_params,
                 susceptibility_func_params=susceptibility_func_params,
-            ).susceptibility(time_vec, **kwargs)
+                period=period,
+            ).susceptibility(time_vec_all, **kwargs)
             cumulative_susceptibility_vec += susceptibility_vec
         susceptibility_vec = cumulative_susceptibility_vec / population_size
-        return susceptibility_vec
+        self._susceptibility_vec_all_0 = susceptibility_vec
+        self._susceptibility_vec_all_0_kwargs = kwargs
 
 
 class HeterogeneousRenewalModel:
@@ -538,15 +529,15 @@ class OutbreakRiskModel:
         vaccination_time_range,
         proportion_vaccinated,
         antibody_model_params_pop,
-        antibody_model_params_random_effects,
         susceptibility_func_params,
-        population_size,
+        antibody_model_params_random_effects=None,
+        population_size=1,
         rng=None,
         rng_seed=None,
     ):
         if rng is None:
             rng = np.random.default_rng(rng_seed)
-        self._susceptibility_model = HeterogeneousPopulationSusceptibilityModel(
+        self._susceptibility_model = PopulationSusceptibilityModel(
             period=period,
             vaccination_time_range=vaccination_time_range,
             proportion_vaccinated=proportion_vaccinated,
@@ -622,6 +613,17 @@ class OutbreakRiskModel:
         if "rng" not in kwargs and "rng_seed" not in kwargs:
             kwargs["rng"] = rng
         return self._renewal_model.simulated_outbreak_risk(time_vec, **kwargs)
+
+    def update_vaccination_params(
+        self, vaccination_time_range=None, proportion_vaccinated=None
+    ):
+        self._susceptibility_model.update_vaccination_params(
+            vaccination_time_range=vaccination_time_range,
+            proportion_vaccinated=proportion_vaccinated,
+        )
+        self._susceptibility_vec = None
+        self._reproduction_no_vec = None
+        self._renewal_model = None
 
     def _build_renewal_model(self):
         time_vec = self._time_vec
