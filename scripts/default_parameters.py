@@ -26,12 +26,12 @@ def _get_default_parameters():
     antibody_model_params_pop = pd.read_csv(
         results_dir / "antibody_model_params_pop.csv", index_col=0, header=None
     )[1].to_dict()
-    # antibody_model_params_random_effects = pd.read_csv(
-    #     results_dir / "antibody_model_params_random_effects.csv",
-    #     index_col=0,
-    #     header=None,
-    # )[1].to_dict()
-    antibody_model_params_random_effects = {key: 0 for key in antibody_model_params_pop}
+    antibody_model_params_random_effects = pd.read_csv(
+        results_dir / "antibody_model_params_random_effects.csv",
+        index_col=0,
+        header=None,
+    )[1].to_dict()
+    # antibody_model_params_random_effects = {key: 0 for key in antibody_model_params_pop}
 
     antibody_covalescent = 114.92
     half_protection_neutralizing_ab = 0.2
@@ -47,8 +47,8 @@ def _get_default_parameters():
 
     vaccination_time_range = [270, 360]
     proportion_vaccinated = 0.5
-    # population_size = 1000
-    population_size = 1
+    population_size = 1000
+    # population_size = 1
 
     default_parameters = {
         "period": period,
