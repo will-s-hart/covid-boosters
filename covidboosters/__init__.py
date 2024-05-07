@@ -1,6 +1,5 @@
 from covidboosters.base import (  # noqa
-    HeterogeneousPopulationSusceptibilityModel,
-    HomogeneousPopulationSusceptibilityModel,
+    PopulationSusceptibilityModel,
     IndividualSusceptibilityModel,
     OutbreakRiskModel,
     PeriodicHeterogeneousRenewalModel,
