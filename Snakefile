@@ -26,8 +26,8 @@ rule without_vaccination:
         "scripts/default_parameters.py",
         "covidboosters/base.py",
     output:
-        "results/without_vaccination_methods.csv",
-        "results/without_vaccination_dispersion.csv",
+        "results/without_vaccination/methods.csv",
+        "results/without_vaccination/dispersion.csv",
     script:
         "scripts/without_vaccination.py"
 
@@ -35,8 +35,8 @@ rule without_vaccination:
 rule without_vaccination_plots:
     input:
         "scripts/plotting/plotting_setup.py",
-        "results/without_vaccination_methods.csv",
-        "results/without_vaccination_dispersion.csv",
+        "results/without_vaccination/methods.csv",
+        "results/without_vaccination/dispersion.csv",
     output:
         "figures/without_vaccination/reproduction_number.pdf",
         "figures/without_vaccination/reproduction_number.svg",
@@ -46,3 +46,11 @@ rule without_vaccination_plots:
         "figures/without_vaccination/outbreak_risk_dispersion.svg",
     script:
         "scripts/plotting/without_vaccination_plots.py"
+
+
+# rule vaccination_example:
+#     script:
+#         vaccination_example.py
+# rule vaccination_example_plots:
+#     script:
+#         vaccination_example_plots.py
