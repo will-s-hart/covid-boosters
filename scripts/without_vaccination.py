@@ -57,9 +57,10 @@ def run_analyses():
             outbreak_risk_model_curr.case_outbreak_risk(time_vec)
         )
     # Save the results
-    results_dir = pathlib.Path(__file__).parents[1] / "results"
-    df_methods.to_csv(results_dir / "without_vaccination_methods.csv")
-    df_dispersion.to_csv(results_dir / "without_vaccination_dispersion.csv")
+    results_dir = pathlib.Path(__file__).parents[1] / "results/without_vaccination"
+    results_dir.mkdir(exist_ok=True, parents=True)
+    df_methods.to_csv(results_dir / "methods.csv")
+    df_dispersion.to_csv(results_dir / "dispersion.csv")
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ import pandas as pd
 
 data_dir = Path(__file__).parents[1] / "data"
 results_dir = Path(__file__).parents[1] / "results"
+results_dir.mkdir(exist_ok=True, parents=True)
 
 df_hcw = pd.read_csv(data_dir / "12HCWs_NLMEM_parameters.csv", index_col=0)
 df_cohort = pd.read_csv(

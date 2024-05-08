@@ -10,15 +10,15 @@ from scripts.plotting import plotting_setup
 
 
 def make_plots():
-    results_dir = pathlib.Path(__file__).parents[2] / "results"
+    results_dir = pathlib.Path(__file__).parents[2] / "results/without_vaccination"
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/without_vaccination"
     figure_dir.mkdir(exist_ok=True, parents=True)
     # Load the results
     outbreak_risk_df_methods = pd.read_csv(
-        results_dir / "without_vaccination_methods.csv", index_col="time"
+        results_dir / "methods.csv", index_col="time"
     )
     outbreak_risk_df_dispersion = pd.read_csv(
-        results_dir / "without_vaccination_dispersion.csv", index_col="time"
+        results_dir / "dispersion.csv", index_col="time"
     )
     # Plot comparison of COR, IOR, and SOR for a single example with no vaccination
     _, ax = plotting_setup.setup_figure(months_x=True, no_periods=2)
