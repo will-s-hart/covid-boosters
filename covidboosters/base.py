@@ -3,6 +3,7 @@ Base module defining main classes and methods.
 """
 
 import numpy as np
+import pandas as pd
 from scipy.integrate import solve_ivp
 from scipy.optimize import root
 from scipy.stats import gamma, poisson
@@ -180,16 +181,19 @@ class PopulationSusceptibilityModel:
     def __init__(
         self,
         period,
-        vaccination_time_range,
-        proportion_vaccinated,
-        antibody_model_params_pop,
-        susceptibility_func_params,
+        vaccination_time_range=None,
+        proportion_vaccinated=0,
+        antibody_model_params_pop=None,
+        susceptibility_func_params=None,
         antibody_model_params_random_effects=None,
         population_size=1,
         rng=None,
         rng_seed=None,
     ):
-        if antibody_model_params_random_effects is None:
+        if (
+            antibody_model_params_random_effects is None
+            and antibody_model_params_pop is not None
+        ):
             antibody_model_params_random_effects = {
                 param_name: 0 for param_name in antibody_model_params_pop
             }
@@ -205,18 +209,25 @@ class PopulationSusceptibilityModel:
         self._proportion_vaccinated = proportion_vaccinated
         self._susceptibility_func_params = susceptibility_func_params
         self._population_size = population_size
-        antibody_model_params_by_indiv = []
-        for _ in range(population_size):
-            antibody_model_params = {}
-            for param_name, param_pop in antibody_model_params_pop.items():
-                param_random_effect = antibody_model_params_random_effects[param_name]
-                antibody_model_params[param_name] = param_pop * np.exp(
-                    param_random_effect * rng.standard_normal()
-                )
-            antibody_model_params_by_indiv.append(antibody_model_params)
-        self._antibody_model_params_by_indiv = antibody_model_params_by_indiv
-        self._susceptibility_vec_all_0 = None
-        self._susceptibility_vec_all_0_kwargs = None
+        if antibody_model_params_pop is not None:
+            self._susceptibility_vec_all_0 = None
+            self._susceptibility_vec_all_0_kwargs = None
+            antibody_model_params_by_indiv = []
+            for _ in range(population_size):
+                antibody_model_params = {}
+                for param_name, param_pop in antibody_model_params_pop.items():
+                    param_random_effect = antibody_model_params_random_effects[
+                        param_name
+                    ]
+                    antibody_model_params[param_name] = param_pop * np.exp(
+                        param_random_effect * rng.standard_normal()
+                    )
+                antibody_model_params_by_indiv.append(antibody_model_params)
+            self._antibody_model_params_by_indiv = antibody_model_params_by_indiv
+        else:
+            self._susceptibility_vec_all_0 = np.ones(period)
+            self._susceptibility_vec_all_0_kwargs = {}
+            self._antibody_model_params_by_indiv = None
 
     def susceptibility(self, time_vec, **kwargs):
         period = self._period
@@ -240,11 +251,39 @@ class PopulationSusceptibilityModel:
         if proportion_vaccinated is not None:
             self._proportion_vaccinated = proportion_vaccinated
 
+    def save_susceptibility_all_0(self, file_path):
+        if self._susceptibility_vec_all_0 is None:
+            self._calculate_susceptibility_all_0()
+        time_vec_all = np.arange(self._period)
+        susceptibility_vec_all_0 = self._susceptibility_vec_all_0
+        susceptibility_all_0_df = pd.DataFrame(
+            {"time": time_vec_all, "susceptibility": susceptibility_vec_all_0},
+        )
+        susceptibility_all_0_df.set_index("time", inplace=True)
+        susceptibility_all_0_df.to_csv(file_path)
+
+    def load_susceptibility_all_0(self, file_path, kwargs_used=None):
+        susceptibility_all_0_df = pd.read_csv(file_path, index_col="time")
+        if not np.array_equal(
+            susceptibility_all_0_df.index.to_numpy(), np.arange(self._period)
+        ):
+            raise ValueError("Time indices in the file do not match the period")
+        self._susceptibility_vec_all_0 = susceptibility_all_0_df[
+            "susceptibility"
+        ].to_numpy()
+        self._susceptibility_vec_all_0_kwargs = kwargs_used or {}
+
     def _susceptibility_all(self, **kwargs):
         period = self._period
         vaccination_time_range = self._vaccination_time_range
         proportion_vaccinated = self._proportion_vaccinated
         time_vec_all = np.arange(period)
+        if (
+            vaccination_time_range in [None, []]
+            or vaccination_time_range[1] == vaccination_time_range[0]
+            or proportion_vaccinated == 0
+        ):
+            return np.ones(period)
         if (
             self._susceptibility_vec_all_0 is None
             or kwargs != self._susceptibility_vec_all_0_kwargs
@@ -526,10 +565,10 @@ class OutbreakRiskModel:
         peak_transmission_time,
         generation_time_dist,
         dispersion_param,
-        vaccination_time_range,
-        proportion_vaccinated,
-        antibody_model_params_pop,
-        susceptibility_func_params,
+        vaccination_time_range=None,
+        proportion_vaccinated=0,
+        antibody_model_params_pop=None,
+        susceptibility_func_params=None,
         antibody_model_params_random_effects=None,
         population_size=1,
         rng=None,
@@ -624,6 +663,12 @@ class OutbreakRiskModel:
         self._susceptibility_vec = None
         self._reproduction_no_vec = None
         self._renewal_model = None
+
+    def save_susceptibility_all_0(self, file_path):
+        self._susceptibility_model.save_susceptibility_all_0(file_path)
+
+    def load_susceptibility_all_0(self, file_path, kwargs_used=None):
+        self._susceptibility_model.load_susceptibility_all_0(file_path, kwargs_used)
 
     def _build_renewal_model(self):
         time_vec = self._time_vec
