@@ -1,0 +1,17 @@
+name: covidboosters
+channels:
+ - conda-forge
+ - bioconda
+ - nodefaults
+dependencies:
+ - numpy
+ - scipy
+ - matplotlib
+ - seaborn
+ - pandas
+ - joblib
+ - tqdm
+ - snakemake
+ #Linting
+ - ruff
+
