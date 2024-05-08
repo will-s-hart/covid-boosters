@@ -51,7 +51,7 @@ def get_default_parameters():
     # population_size = 1
 
     sim_incidence_cutoff = 10
-    no_simulations = 50
+    no_simulations = 5000
 
     default_parameters = {
         "period": period,
