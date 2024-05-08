@@ -7,7 +7,7 @@ from scipy.stats import gamma, rv_discrete
 results_dir = Path(__file__).parents[1] / "results"
 
 
-def _get_default_parameters():
+def get_default_parameters():
     period = 360
     unvacc_rep_no_mean = 2
     unvacc_rep_no_prop_var = 0.25
@@ -50,6 +50,9 @@ def _get_default_parameters():
     population_size = 1000
     # population_size = 1
 
+    sim_incidence_cutoff = 10
+    no_simulations = 50
+
     default_parameters = {
         "period": period,
         "unvaccinated_reproduction_no_mean": unvacc_rep_no_mean,
@@ -63,9 +66,8 @@ def _get_default_parameters():
         "vaccination_time_range": vaccination_time_range,
         "proportion_vaccinated": proportion_vaccinated,
         "population_size": population_size,
+        "sim_incidence_cutoff": sim_incidence_cutoff,
+        "no_simulations": no_simulations,
     }
 
     return default_parameters
-
-
-DEFAULT_PARAMETERS = _get_default_parameters()
