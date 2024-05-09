@@ -12,6 +12,10 @@ rule all:
         "figures/vaccination_example/reproduction_number.svg",
         "figures/vaccination_example/outbreak_risk.pdf",
         "figures/vaccination_example/outbreak_risk.svg",
+        "figures/within_host_example/antibodies.pdf",
+        "figures/within_host_example/antibodies.svg",
+        "figures/within_host_example/susceptibility.pdf",
+        "figures/within_host_example/susceptibility.svg",
 
 
 rule format_antibody_model_param_estimates:
@@ -50,6 +54,30 @@ rule without_vaccination_plots:
         "figures/without_vaccination/outbreak_risk_dispersion.svg",
     script:
         "scripts/plotting/without_vaccination_plots.py"
+
+
+rule within_host_example:
+    input:
+        "results/antibody_model_params.csv",
+        "scripts/default_parameters.py",
+        "covidboosters/base.py",
+    output:
+        "results/within_host_example.csv",
+    script:
+        "scripts/within_host_example.py"
+
+
+rule within_host_example_plots:
+    input:
+        "scripts/plotting/plotting_utils.py",
+        "results/within_host_example.csv",
+    output:
+        "figures/within_host_example/antibodies.pdf",
+        "figures/within_host_example/antibodies.svg",
+        "figures/within_host_example/susceptibility.pdf",
+        "figures/within_host_example/susceptibility.svg",
+    script:
+        "scripts/plotting/within_host_example_plots.py"
 
 
 rule vaccination_example:
