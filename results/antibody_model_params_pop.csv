@@ -1,8 +1,0 @@
-,0
-mrna_dose,100.00000000000013
-mrna_decay_rate,0.6931471805599453
-delay_to_antibody_response,4.089999999999998
-max_antibody_production_rate,6085.191218919678
-mrna_response_steepness,0.017581619828575732
-half_maximal_response_mrna,28100.000000000004
-antibody_decay_rate,0.875

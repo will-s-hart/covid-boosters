@@ -23,15 +23,13 @@ def get_default_parameters():
 
     dispersion_param = 0.41
 
-    antibody_model_params_pop = pd.read_csv(
-        results_dir / "antibody_model_params_pop.csv", index_col=0, header=None
-    )[1].to_dict()
-    antibody_model_params_random_effects = pd.read_csv(
-        results_dir / "antibody_model_params_random_effects.csv",
-        index_col=0,
-        header=None,
-    )[1].to_dict()
-    # antibody_model_params_random_effects = {key: 0 for key in antibody_model_params_pop}
+    df_antibody_model_params = pd.read_csv(
+        results_dir / "antibody_model_params.csv", index_col=0
+    )
+    antibody_model_params_pop = df_antibody_model_params["population_value"].to_dict()
+    antibody_model_params_random_effects = df_antibody_model_params[
+        "random_effect"
+    ].to_dict()
 
     antibody_covalescent = 114.92
     half_protection_neutralizing_ab = 0.2

@@ -28,7 +28,11 @@ df_params_individual_log = np.log(df_params_individual)
 df_params_pop = np.exp(df_params_individual_log.mean())
 df_params_random_effects = df_params_individual_log.std()
 
-df_params_pop.to_csv(results_dir / "antibody_model_params_pop.csv")
-df_params_random_effects.to_csv(
-    results_dir / "antibody_model_params_random_effects.csv"
+df_out = pd.concat(
+    [df_params_pop, df_params_random_effects],
+    axis=1,
 )
+df_out.columns = ["population_value", "random_effect"]
+df_out.index.rename("parameter", inplace=True)
+
+df_out.to_csv(results_dir / "antibody_model_params.csv")
