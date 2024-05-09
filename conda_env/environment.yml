@@ -14,4 +14,6 @@ dependencies:
  - snakemake
  #Linting
  - ruff
+ #Notebooks
+ - ipykernel
 
