@@ -29,9 +29,9 @@ def run_analyses():
     )
     df_methods = pd.DataFrame({"time": time_vec})
     df_methods.set_index("time", inplace=True)
-    df_methods["R"] = outbreak_risk_model_methods.reproduction_no(time_vec)
-    df_methods["COR"] = outbreak_risk_model_methods.case_outbreak_risk(time_vec)
-    df_methods["IOR"] = outbreak_risk_model_methods.instantaneous_outbreak_risk(
+    df_methods["r"] = outbreak_risk_model_methods.reproduction_no(time_vec)
+    df_methods["cor"] = outbreak_risk_model_methods.case_outbreak_risk(time_vec)
+    df_methods["ior"] = outbreak_risk_model_methods.instantaneous_outbreak_risk(
         time_vec
     )
     time_vec_sor = np.arange(2 * period, step=30)
@@ -39,7 +39,7 @@ def run_analyses():
         "incidence_cutoff": default_parameters["sim_incidence_cutoff"],
         "no_simulations": default_parameters["no_simulations"],
     }
-    df_methods.loc[time_vec_sor, "SOR"] = (
+    df_methods.loc[time_vec_sor, "sor"] = (
         outbreak_risk_model_methods.simulated_outbreak_risk(time_vec_sor, **kwargs_sor)
     )
     # Comparison of COR values for different values of the dispersion parameter
