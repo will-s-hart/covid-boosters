@@ -10,9 +10,14 @@ import seaborn as sns
 
 def set_sns_theme():
     rc_params = {
+        # "figure.autolayout": True,
+        "figure.figsize": (6, 6),
+        # "figure.subplot.left": 0.2,
+        # "figure.subplot.right": 0.8,
+        # "figure.subplot.bottom": 0.15,
+        # "figure.subplot.top": 0.85,
         "axes.spines.top": False,
         "axes.spines.right": False,
-        "figure.autolayout": True,
         "axes.autolimit_mode": "round_numbers",
         "savefig.transparent": True,
         "savefig.format": "pdf",
@@ -30,14 +35,21 @@ def set_sns_theme():
 
 def setup_figure():
     fig = plt.figure()
-    ax = fig.add_subplot(box_aspect=1)
+    ax = fig.add_axes([0.2, 0.2, 0.6, 0.6])
     return fig, ax
+
+
+def setup_figure_with_cbar():
+    fig = plt.figure()
+    ax = fig.add_axes([0.15, 0.2, 0.6, 0.6])
+    cbar_ax = fig.add_axes([0.78, 0.2, 0.03, 0.6])
+    return fig, ax, cbar_ax
 
 
 def months_x_axis(ax, period=360, no_periods=2):
     if period != 360:
         raise NotImplementedError("Only period=360 is currently supported.")
-    month_starts = np.arange(0, period + 1, period / 12)
+    month_starts = np.arange(0, period + 1, period // 12)
     month_list = ["Jan", "", "", "Apr", "", "", "Jul", "", "", "Oct", "", "", "Jan"]
     ax.set_xlim(0, no_periods * period)
     ax.set_xticks(
@@ -47,7 +59,7 @@ def months_x_axis(ax, period=360, no_periods=2):
         ).flatten(),
         labels=month_list * no_periods,
     )
-    ax.set_xlabel("")
+    ax.set_xlabel(" ")
 
 
 def shade_vaccination_time_range(ax, vaccination_time_range, period=360, no_periods=2):
