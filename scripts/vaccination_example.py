@@ -10,11 +10,14 @@ from covidboosters import OutbreakRiskModel
 from scripts.default_parameters import get_default_parameters
 
 
-def run_analyses():
+def run_analyses(
+    save_path=None,
+    save_path_susceptibility_all_0=None,
+    load_path_susceptibility_all_0=None,
+    **kwargs_outbreak_risk_model,
+):
     default_parameters = get_default_parameters()
-    period = default_parameters["period"]
-    time_vec = np.arange(2 * period)
-    # Example of COR with vaccination
+    kwargs_outbreak_risk_model_in = kwargs_outbreak_risk_model
     kwargs_outbreak_risk_model = {
         key: default_parameters[key]
         for key in [
@@ -33,7 +36,13 @@ def run_analyses():
         ]
     }
     kwargs_outbreak_risk_model["rng_seed"] = 2
+    kwargs_outbreak_risk_model.update(kwargs_outbreak_risk_model_in)
+    period = kwargs_outbreak_risk_model["period"]
+    time_vec = np.arange(2 * period)
+    # Example of COR with vaccination
     outbreak_risk_model = OutbreakRiskModel(**kwargs_outbreak_risk_model)
+    if load_path_susceptibility_all_0 is not None:
+        outbreak_risk_model.load_susceptibility_all_0(load_path_susceptibility_all_0)
     df = pd.DataFrame({"time": time_vec})
     df.set_index("time", inplace=True)
     df["r_unvacc"] = outbreak_risk_model.unvaccinated_reproduction_no(time_vec)
@@ -46,13 +55,17 @@ def run_analyses():
     )
     df["cor_unvacc"] = outbreak_risk_model_unvacc.case_outbreak_risk(time_vec)
     # Save the results
-    results_dir = pathlib.Path(__file__).parents[1] / "results"
-    results_dir.mkdir(exist_ok=True, parents=True)
-    df.to_csv(results_dir / "vaccination_example.csv")
-    outbreak_risk_model.save_susceptibility_all_0(
-        results_dir / "susceptibility_all_0.csv"
-    )
+    if save_path is not None:
+        df.to_csv(save_path)
+    if save_path_susceptibility_all_0 is not None:
+        outbreak_risk_model.save_susceptibility_all_0(save_path_susceptibility_all_0)
+    return df
 
 
 if __name__ == "__main__":
-    run_analyses()
+    results_dir = pathlib.Path(__file__).parents[1] / "results"
+    results_dir.mkdir(exist_ok=True, parents=True)
+    run_analyses(
+        save_path=results_dir / "vaccination_example.csv",
+        save_path_susceptibility_all_0=results_dir / "susceptibility_all_0.csv",
+    )
