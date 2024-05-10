@@ -6,16 +6,20 @@ rule all:
         "figures/without_vaccination/outbreak_risk_methods.svg",
         "figures/without_vaccination/outbreak_risk_dispersion.pdf",
         "figures/without_vaccination/outbreak_risk_dispersion.svg",
+        "figures/within_host_example/antibodies.pdf",
+        "figures/within_host_example/antibodies.svg",
+        "figures/within_host_example/susceptibility.pdf",
+        "figures/within_host_example/susceptibility.svg",
         "figures/vaccination_example/susceptibility.pdf",
         "figures/vaccination_example/susceptibility.svg",
         "figures/vaccination_example/reproduction_number.pdf",
         "figures/vaccination_example/reproduction_number.svg",
         "figures/vaccination_example/outbreak_risk.pdf",
         "figures/vaccination_example/outbreak_risk.svg",
-        "figures/within_host_example/antibodies.pdf",
-        "figures/within_host_example/antibodies.svg",
-        "figures/within_host_example/susceptibility.pdf",
-        "figures/within_host_example/susceptibility.svg",
+        "figures/optimizing_vaccination/heatmap.pdf",
+        "figures/optimizing_vaccination/heatmap.svg",
+        "figures/optimizing_vaccination/outbreak_risk.pdf",
+        "figures/optimizing_vaccination/outbreak_risk.svg",
 
 
 rule format_antibody_model_param_estimates:
@@ -105,3 +109,32 @@ rule vaccination_example_plots:
         "figures/vaccination_example/outbreak_risk.svg",
     script:
         "scripts/plotting/vaccination_example_plots.py"
+
+
+rule optimizing_vaccination:
+    input:
+        "results/antibody_model_params.csv",
+        "scripts/default_parameters.py",
+        "covidboosters/base.py",
+        "scripts/vaccination_example.py",
+    output:
+        "results/optimizing_vaccination/grid_search.csv",
+        "results/optimizing_vaccination/best.csv",
+        "results/optimizing_vaccination/vaccination_time_range_best.csv",
+    script:
+        "scripts/optimizing_vaccination.py"
+
+
+rule optimizing_vaccination_plots:
+    input:
+        "scripts/plotting/plotting_utils.py",
+        "results/optimizing_vaccination/grid_search.csv",
+        "results/optimizing_vaccination/best.csv",
+        "results/optimizing_vaccination/vaccination_time_range_best.csv",
+    output:
+        "figures/optimizing_vaccination/heatmap.pdf",
+        "figures/optimizing_vaccination/heatmap.svg",
+        "figures/optimizing_vaccination/outbreak_risk.pdf",
+        "figures/optimizing_vaccination/outbreak_risk.svg",
+    script:
+        "scripts/plotting/optimizing_vaccination_plots.py"
