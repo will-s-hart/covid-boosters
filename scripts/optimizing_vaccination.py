@@ -15,27 +15,9 @@ from scripts import vaccination_example
 from scripts.default_parameters import get_default_parameters
 
 
-def run_analyses():
-    results_dir = pathlib.Path(__file__).parents[1] / "results/optimizing_vaccination"
-    results_dir.mkdir(exist_ok=True, parents=True)
-    load_path_susceptibility_all_0 = (
-        pathlib.Path(__file__).parents[1] / "results/susceptibility_all_0.csv"
-    )
-    vaccination_time_range_best = run_grid_search(
-        save_path=results_dir / "grid_search.csv",
-        save_path_vaccination_time_range_best=results_dir
-        / "vaccination_time_range_best.csv",
-        load_path_susceptibility_all_0=load_path_susceptibility_all_0,
-    )
-    vaccination_example.run_analyses(
-        save_path=results_dir / "best.csv",
-        load_path_susceptibility_all_0=load_path_susceptibility_all_0,
-        vaccination_time_range=vaccination_time_range_best,
-    )
-
-
-def run_grid_search(
-    save_path=None,
+def run_analyses(
+    save_path,
+    save_path_best=None,
     save_path_vaccination_time_range_best=None,
     load_path_susceptibility_all_0=None,
     **kwargs_outbreak_risk_model,
@@ -62,14 +44,29 @@ def run_grid_search(
     kwargs_outbreak_risk_model["rng_seed"] = 2
     kwargs_outbreak_risk_model.update(kwargs_outbreak_risk_model_in)
     period = kwargs_outbreak_risk_model["period"]
+    # Set up outbreak risk model and load susceptibility values with vaccination of all
+    # individuals at time 0
+    outbreak_risk_model = OutbreakRiskModel(**kwargs_outbreak_risk_model)
+    if load_path_susceptibility_all_0 is None:
+        raise ValueError(
+            "load_path_susceptibility_all_0 must be provided. If the susceptibility "
+            "values with vaccination of all individuals at time 0 are not available, "
+            "pass a path for a new file to be created to save the values."
+        )
+    if pathlib.Path(load_path_susceptibility_all_0).exists():
+        outbreak_risk_model.load_susceptibility_all_0(load_path_susceptibility_all_0)
+    else:
+        print(
+            "Saved susceptibility values with vaccination of all individuals at time 0 "
+            "not found. Will be computed from scratch and saved for future use at the"
+            "provided path"
+        )
+        _ = outbreak_risk_model.susceptibility(np.arange(period))
+        outbreak_risk_model.save_susceptibility_all_0(load_path_susceptibility_all_0)
     # Grid of vaccination start times and durations
-    step = 5
+    step = 10
     vaccination_start_time_vals = np.arange(0, period + 1, step)
     vaccination_duration_vals = np.arange(step, period + 1, step)
-    # Set up outbreak risk model
-    outbreak_risk_model = OutbreakRiskModel(**kwargs_outbreak_risk_model)
-    if load_path_susceptibility_all_0 is not None:
-        outbreak_risk_model.load_susceptibility_all_0(load_path_susceptibility_all_0)
 
     # Loop over vaccination start times and durations
     def worker(vaccination_start_time, vaccination_duration):
@@ -111,14 +108,19 @@ def run_grid_search(
         .rename_axis("duration", axis=1)
     )
     # Save the results
-    if save_path is not None:
-        df_grid_search.to_csv(save_path)
-    # Return optimal vaccination time range
+    df_grid_search.to_csv(save_path)
+    # Calculate optimal vaccination time range and corresponding case outbreak risk
     start_time_best, duration_best = df_grid_search.stack().idxmin()
     vaccination_time_range_best = [
         start_time_best,
         start_time_best + duration_best,
     ]
+    if save_path_best is not None:
+        vaccination_example.run_analyses(
+            save_path=save_path_best,
+            load_path_susceptibility_all_0=load_path_susceptibility_all_0,
+            vaccination_time_range=vaccination_time_range_best,
+        )
     if save_path_vaccination_time_range_best is not None:
         pd.DataFrame(
             {
@@ -126,8 +128,16 @@ def run_grid_search(
                 "end": [vaccination_time_range_best[1]],
             }
         ).to_csv(save_path_vaccination_time_range_best)
-    return vaccination_time_range_best
 
 
 if __name__ == "__main__":
-    run_analyses()
+    results_dir = pathlib.Path(__file__).parents[1] / "results/optimizing_vaccination"
+    results_dir.mkdir(exist_ok=True, parents=True)
+    run_analyses(
+        save_path=results_dir / "grid_search.csv",
+        save_path_best=results_dir / "best.csv",
+        save_path_vaccination_time_range_best=results_dir
+        / "vaccination_time_range_best.csv",
+        load_path_susceptibility_all_0=pathlib.Path(__file__).parents[1]
+        / "results/susceptibility_all_0.csv",
+    )
