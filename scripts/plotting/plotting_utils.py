@@ -63,15 +63,13 @@ def months_x_axis(ax, period=360, no_periods=2):
 
 
 def shade_vaccination_time_range(ax, vaccination_time_range, period=360, no_periods=2):
-    if (
-        vaccination_time_range[0] >= vaccination_time_range[1]
-        or vaccination_time_range[0] < 0
-        or vaccination_time_range[1] > period
-    ):
-        raise NotImplementedError(
-            "Only vaccination time ranges not including year ends are currently "
-            "supported."
-        )
+    if vaccination_time_range[1] > period:
+        vaccination_time_range[0] -= period
+        vaccination_time_range[1] -= period
+    if vaccination_time_range[0] < 0:
+        no_periods += 1
+    if vaccination_time_range[0] >= vaccination_time_range[1]:
+        raise ValueError("Attempting to shade empty time range.")
     ylim = ax.get_ylim()
     for i in range(no_periods):
         ax.fill_betweenx(
