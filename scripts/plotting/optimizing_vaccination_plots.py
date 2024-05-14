@@ -13,19 +13,18 @@ from scripts.default_parameters import get_default_parameters
 from scripts.plotting import plotting_utils
 
 
-def make_plots():
+def make_plots(
+    load_path,
+    load_path_best,
+    load_path_vaccination_time_range_best,
+    figure_path_heatmap,
+    figure_path_best,
+):
     plotting_utils.set_sns_theme()
-    results_dir = pathlib.Path(__file__).parents[2] / "results/optimizing_vaccination"
-    figure_dir = pathlib.Path(__file__).parents[2] / "figures/optimizing_vaccination"
-    figure_dir.mkdir(exist_ok=True, parents=True)
     # Load the results
-    df_grid_search = pd.read_csv(
-        results_dir / "grid_search.csv", index_col=0
-    ).rename_axis("duration", axis=1)
-    df_best = pd.read_csv(results_dir / "best.csv", index_col="time")
-    df_vaccination_time_range_best = pd.read_csv(
-        results_dir / "vaccination_time_range_best.csv"
-    )
+    df_grid_search = pd.read_csv(load_path, index_col=0).rename_axis("duration", axis=1)
+    df_best = pd.read_csv(load_path_best, index_col="time")
+    df_vaccination_time_range_best = pd.read_csv(load_path_vaccination_time_range_best)
     vaccination_time_range_best = [
         df_vaccination_time_range_best["start"][0],
         df_vaccination_time_range_best["end"][0],
@@ -34,8 +33,8 @@ def make_plots():
     period = default_parameters["period"]
     # Plot heatmap of max COR for different vaccination start times and durations
     make_heatmap_plot(df_grid_search, vaccination_time_range_best, period=period)
-    plt.savefig(figure_dir / "heatmap.pdf")
-    plt.savefig(figure_dir / "heatmap.svg")
+    plt.savefig(figure_path_heatmap)
+    plt.savefig(str(figure_path_heatmap).replace(".svg", ".pdf"))
     # Plot COR with and without vaccination
     _, ax = plotting_utils.setup_figure()
     df_best["cor_unvacc"].plot(ax=ax, label="Without vaccination")
@@ -45,8 +44,8 @@ def make_plots():
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range_best)
     ax.set_ylabel("Case outbreak risk")
     ax.legend()
-    plt.savefig(figure_dir / "outbreak_risk.pdf")
-    plt.savefig(figure_dir / "outbreak_risk.svg")
+    plt.savefig(figure_path_best)
+    plt.savefig(str(figure_path_best).replace(".svg", ".pdf"))
     # Show plots
     plt.show()
 
@@ -90,4 +89,14 @@ def make_heatmap_plot(df_grid_search, vaccination_time_range_best, period=360):
 
 
 if __name__ == "__main__":
-    make_plots()
+    results_dir = pathlib.Path(__file__).parents[2] / "results/optimizing_vaccination"
+    figure_dir = pathlib.Path(__file__).parents[2] / "figures/optimizing_vaccination"
+    figure_dir.mkdir(exist_ok=True, parents=True)
+    make_plots(
+        load_path=results_dir / "grid_search.csv",
+        load_path_best=results_dir / "best.csv",
+        load_path_vaccination_time_range_best=results_dir
+        / "vaccination_time_range_best.csv",
+        figure_path_heatmap=figure_dir / "heatmap.svg",
+        figure_path_best=figure_dir / "best.svg",
+    )
