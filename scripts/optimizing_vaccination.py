@@ -119,7 +119,10 @@ def run_analyses(
         vaccination_example.run_analyses(
             save_path=save_path_best,
             load_path_susceptibility_all_0=load_path_susceptibility_all_0,
-            vaccination_time_range=vaccination_time_range_best,
+            **{
+                **kwargs_outbreak_risk_model,
+                "vaccination_time_range": vaccination_time_range_best,
+            },
         )
     if save_path_vaccination_time_range_best is not None:
         pd.DataFrame(
