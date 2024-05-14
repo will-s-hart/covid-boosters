@@ -9,8 +9,8 @@ results_dir = Path(__file__).parents[1] / "results"
 
 def get_default_parameters():
     period = 360
-    unvacc_rep_no_mean = 2
-    unvacc_rep_no_prop_var = 0.25
+    unvacc_rep_no_mean = 2.5  # with below, max is 3
+    unvacc_rep_no_prop_var = 0.2
     peak_transmission_time = 0
 
     generation_time_max = 30
@@ -34,7 +34,8 @@ def get_default_parameters():
     antibody_covalescent = 114.92
     half_protection_neutralizing_ab = 0.2
     omicron_reduction_factor = 22
-    vaccine_adaptation_factor = 1.61
+    # vaccine_adaptation_factor = 1.61
+    vaccine_adaptation_factor = 1
 
     susceptibility_func_params = {
         "antibody_response_steepness": np.exp(1.13) / np.log(10),
