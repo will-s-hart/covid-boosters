@@ -41,7 +41,8 @@ def make_plots():
     plt.savefig(figure_dir / "susceptibility.pdf")
     plt.savefig(figure_dir / "susceptibility.svg")
     # Show plots
-    plt.show()
+    if "snakemake" not in globals():
+        plt.show()
 
 
 if __name__ == "__main__":

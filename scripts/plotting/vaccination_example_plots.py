@@ -34,7 +34,7 @@ def make_plots():
     df["r_unvacc"].plot(ax=ax, label="Without vaccination")
     df["r"].plot(ax=ax, label="With vaccination")
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
-    ax.set_ylim(0, 3)
+    ax.set_ylim(0, 3.02)
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range)
     ax.set_ylabel("Instantaneous reproduction number")
     ax.legend(loc="lower right")
@@ -52,7 +52,8 @@ def make_plots():
     plt.savefig(figure_dir / "outbreak_risk.pdf")
     plt.savefig(figure_dir / "outbreak_risk.svg")
     # Show plots
-    plt.show()
+    if "snakemake" not in globals():
+        plt.show()
 
 
 if __name__ == "__main__":

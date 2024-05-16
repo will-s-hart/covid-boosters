@@ -27,7 +27,7 @@ def make_plots():
     _, ax = plotting_utils.setup_figure()
     outbreak_risk_df_methods["r"].plot(ax=ax)
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
-    ax.set_ylim(0, 3.01)
+    ax.set_ylim(0, 3.02)
     ax.set_ylabel("Instantaneous reproduction number")
     plt.savefig(figure_dir / "reproduction_number.pdf")
     plt.savefig(figure_dir / "reproduction_number.svg")
@@ -59,7 +59,8 @@ def make_plots():
     plt.savefig(figure_dir / "outbreak_risk_dispersion.pdf")
     plt.savefig(figure_dir / "outbreak_risk_dispersion.svg")
     # Show plots
-    plt.show()
+    if "snakemake" not in globals():
+        plt.show()
 
 
 if __name__ == "__main__":

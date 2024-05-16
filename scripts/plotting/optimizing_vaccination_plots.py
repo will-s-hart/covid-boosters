@@ -19,6 +19,7 @@ def make_plots(
     load_path_vaccination_time_range_best,
     figure_path_heatmap,
     figure_path_best,
+    show_plots=True,
 ):
     plotting_utils.set_sns_theme()
     # Load the results
@@ -46,8 +47,9 @@ def make_plots(
     ax.legend()
     plt.savefig(figure_path_best)
     plt.savefig(str(figure_path_best).replace(".svg", ".pdf"))
-    # Show plots
-    plt.show()
+    # Show plots if not running from snakemake
+    if show_plots:
+        plt.show()
 
 
 def make_heatmap_plot(df_grid_search, vaccination_time_range_best, period=360):
@@ -99,4 +101,5 @@ if __name__ == "__main__":
         / "vaccination_time_range_best.csv",
         figure_path_heatmap=figure_dir / "heatmap.svg",
         figure_path_best=figure_dir / "best.svg",
+        show_plots="snakemake" not in globals(),
     )
