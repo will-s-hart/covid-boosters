@@ -1,10 +1,12 @@
-from pathlib import Path
+import functools
+import pathlib
 
 import numpy as np
 import pandas as pd
-from scipy.stats import gamma, rv_discrete
+from scipy import integrate
+from scipy.stats import lognorm, rv_discrete
 
-results_dir = Path(__file__).parents[1] / "results"
+results_dir = pathlib.Path(__file__).parents[1] / "results"
 
 
 def get_default_parameters():
@@ -13,13 +15,12 @@ def get_default_parameters():
     unvacc_rep_no_prop_var = 0.2
     peak_transmission_time = 0
 
-    generation_time_max = 30
-    generation_time_vals = np.arange(1, generation_time_max + 1)
-    generation_time_probs = gamma.pdf(generation_time_vals, a=3, scale=5 / 3)
-    generation_time_probs /= generation_time_probs.sum()
-    generation_time_dist = rv_discrete(
-        values=(generation_time_vals, generation_time_probs)
+    generation_time_logmean = 0.979396480343543
+    generation_time_logsd = 0.470500197316974
+    generation_time_dist_cont = lognorm(
+        s=generation_time_logsd, scale=np.exp(generation_time_logmean)
     )
+    generation_time_dist = _discretise_gt(generation_time_dist_cont, t_max=14)
 
     dispersion_param = 0.41
 
@@ -70,3 +71,33 @@ def get_default_parameters():
     }
 
     return default_parameters
+
+
+def _discretise_gt(gt_dist_cont, t_max):
+    def _integrand_fun(t, y):
+        # To get probability mass function at time x, need to integrate this expression
+        # with respect to y between y=x-1 and and y=x+1
+        return (1 - abs(t - y)) * gt_dist_cont.pdf(y)
+
+    # Set up vector of t values and pre-allocate vector of probabilities
+    t_vec = np.arange(t_max + 1)
+    p_vec = np.zeros(len(t_vec))
+    # Calculate probability mass function at each x value
+    for i, t in enumerate(t_vec):
+        integrand = functools.partial(_integrand_fun, t)
+        p_vec[i] = integrate.quad(integrand, t - 1, t + 1)[0]
+    # Reassign probability mass from 0 to 1
+    p_vec[1] = p_vec[0] + p_vec[1]
+    p_vec = p_vec[1:]
+    t_vec = t_vec[1:]
+    # Normalise probabilities
+    p_sum = np.sum(p_vec)
+    if 1 - p_sum > 1e-3:
+        raise ValueError("Sum of probabilities is not close to 1. Increase t_max.")
+    p_vec = p_vec / p_sum
+    gt_dist_discr = rv_discrete(values=(t_vec, p_vec))
+    return gt_dist_discr
+
+
+if __name__ == "__main__":
+    get_default_parameters()
