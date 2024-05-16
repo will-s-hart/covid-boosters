@@ -23,6 +23,37 @@ rule all:
         "results/optimizing_vaccination/vaccination_time_range_best.csv",
         "figures/optimizing_vaccination/heatmap.svg",
         "figures/optimizing_vaccination/best.svg",
+
+
+rule results:
+    input:
+        "results/antibody_model_params.csv",
+        "results/without_vaccination/methods.csv",
+        "results/without_vaccination/dispersion.csv",
+        "results/within_host_example.csv",
+        "results/vaccination_example.csv",
+        "results/susceptibility_all_0.csv",
+        "results/optimizing_vaccination/grid_search.csv",
+        "results/optimizing_vaccination/best.csv",
+        "results/optimizing_vaccination/vaccination_time_range_best.csv",
+
+
+rule figures:
+    input:
+        "figures/without_vaccination/reproduction_number.svg",
+        "figures/without_vaccination/outbreak_risk_methods.svg",
+        "figures/without_vaccination/outbreak_risk_dispersion.svg",
+        "figures/within_host_example/antibodies.svg",
+        "figures/within_host_example/susceptibility.svg",
+        "figures/vaccination_example/susceptibility.svg",
+        "figures/vaccination_example/reproduction_number.svg",
+        "figures/vaccination_example/outbreak_risk.svg",
+        "figures/optimizing_vaccination/heatmap.svg",
+        "figures/optimizing_vaccination/best.svg",
+
+
+rule supp:
+    input:
         expand(
             "results/sensitivity_unvacc_r/grid_search_{mean_index}_{prop_var_index}.csv",
             mean_index=mean_index_vals,
@@ -50,17 +81,8 @@ rule all:
         ),
 
 
-rule results:
+rule supp_results:
     input:
-        "results/antibody_model_params.csv",
-        "results/without_vaccination/methods.csv",
-        "results/without_vaccination/dispersion.csv",
-        "results/within_host_example.csv",
-        "results/vaccination_example.csv",
-        "results/susceptibility_all_0.csv",
-        "results/optimizing_vaccination/grid_search.csv",
-        "results/optimizing_vaccination/best.csv",
-        "results/optimizing_vaccination/vaccination_time_range_best.csv",
         expand(
             "results/sensitivity_unvacc_r/grid_search_{mean_index}_{prop_var_index}.csv",
             mean_index=mean_index_vals,
@@ -78,18 +100,8 @@ rule results:
         ),
 
 
-rule figures:
+rule supp_figures:
     input:
-        "figures/without_vaccination/reproduction_number.svg",
-        "figures/without_vaccination/outbreak_risk_methods.svg",
-        "figures/without_vaccination/outbreak_risk_dispersion.svg",
-        "figures/within_host_example/antibodies.svg",
-        "figures/within_host_example/susceptibility.svg",
-        "figures/vaccination_example/susceptibility.svg",
-        "figures/vaccination_example/reproduction_number.svg",
-        "figures/vaccination_example/outbreak_risk.svg",
-        "figures/optimizing_vaccination/heatmap.svg",
-        "figures/optimizing_vaccination/best.svg",
         expand(
             "figures/sensitivity_unvacc_r/heatmap_{mean_index}_{prop_var_index}.svg",
             mean_index=mean_index_vals,
