@@ -32,23 +32,26 @@ def get_default_parameters():
         "random_effect"
     ].to_dict()
 
-    antibody_covalescent = 114.92
-    half_protection_neutralizing_ab = 0.2
-    omicron_reduction_factor = 22
-    # vaccine_adaptation_factor = 1.61
-    vaccine_adaptation_factor = 1
+    # antibody_covalescent = 114.92
+    # half_protection_neutralizing_ab = 0.2
+    # omicron_reduction_factor = 22
+    # # vaccine_adaptation_factor = 1.61
+    # vaccine_adaptation_factor = 1
 
+    # susceptibility_func_params = {
+    #     "antibody_response_steepness": np.exp(1.13) / np.log(10),
+    #     "half_protection_antibody": half_protection_neutralizing_ab
+    #     * antibody_covalescent
+    #     * (omicron_reduction_factor / vaccine_adaptation_factor),
+    # }
     susceptibility_func_params = {
-        "antibody_response_steepness": np.exp(1.13) / np.log(10),
-        "half_protection_antibody": half_protection_neutralizing_ab
-        * antibody_covalescent
-        * (omicron_reduction_factor / vaccine_adaptation_factor),
+        "antibody_response_steepness": 3.2 / np.log(10),
+        "half_protection_antibody": 1000,
     }
 
     vaccination_time_range = [270, 360]
     proportion_vaccinated = 0.5
     population_size = 1000
-    # population_size = 1
 
     sim_incidence_cutoff = 10
     no_simulations = 5000
