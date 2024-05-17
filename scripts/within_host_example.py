@@ -1,10 +1,10 @@
 import pathlib
 import sys
 
-sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
-
 import numpy as np
 import pandas as pd
+
+sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
 
 from covidboosters import IndividualSusceptibilityModel
 from scripts.default_parameters import get_default_parameters

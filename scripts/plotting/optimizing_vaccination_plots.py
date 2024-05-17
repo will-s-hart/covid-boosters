@@ -1,13 +1,13 @@
 import pathlib
 import sys
 
-sys.path.insert(1, str(pathlib.Path(__file__).parents[2]))
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from scipy import interpolate
+
+sys.path.insert(1, str(pathlib.Path(__file__).parents[2]))
 
 from scripts.default_parameters import get_default_parameters
 from scripts.plotting import plotting_utils
@@ -20,6 +20,7 @@ def make_plots(
     figure_path_heatmap,
     figure_path_best,
     show_plots=True,
+    ylim_best=(0, 0.5),
 ):
     plotting_utils.set_sns_theme()
     # Load the results
@@ -41,7 +42,7 @@ def make_plots(
     df_best["cor_unvacc"].plot(ax=ax, label="Without vaccination")
     df_best["cor"].plot(ax=ax, label="With vaccination")
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
-    ax.set_ylim(0, 0.5)
+    ax.set_ylim(ylim_best)
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range_best)
     ax.set_ylabel("Case outbreak risk")
     ax.legend()

@@ -1,8 +1,3 @@
-import pathlib
-import sys
-
-sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
-
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns

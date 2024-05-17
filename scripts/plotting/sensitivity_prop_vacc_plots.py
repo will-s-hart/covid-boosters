@@ -32,11 +32,11 @@ def make_plots(prop_vacc_index):
 
 
 if __name__ == "__main__":
-    if "snakemake" in globals() and "mean_index" in snakemake.wildcards:  # noqa: F821
+    if "snakemake" in globals():
         make_plots(
             prop_vacc_index=int(snakemake.wildcards["prop_vacc_index"]),  # noqa: F821
         )
     else:
-        for _prop_vacc_index in range(3):
+        for _prop_vacc_index in range(2):
             make_plots(_prop_vacc_index)
         plt.show()

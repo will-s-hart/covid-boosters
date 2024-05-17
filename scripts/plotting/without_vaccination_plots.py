@@ -1,10 +1,10 @@
 import pathlib
 import sys
 
-sys.path.insert(1, str(pathlib.Path(__file__).parents[2]))
-
 import matplotlib.pyplot as plt
 import pandas as pd
+
+sys.path.insert(1, str(pathlib.Path(__file__).parents[2]))
 
 from scripts.default_parameters import get_default_parameters
 from scripts.plotting import plotting_utils
@@ -55,7 +55,7 @@ def make_plots():
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(0, 1)
     ax.set_ylabel("Outbreak risk")
-    ax.legend()
+    ax.legend(loc="upper right")
     plt.savefig(figure_dir / "outbreak_risk_dispersion.pdf")
     plt.savefig(figure_dir / "outbreak_risk_dispersion.svg")
     # Show plots

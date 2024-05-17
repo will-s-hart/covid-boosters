@@ -1,11 +1,11 @@
 import pathlib
 import sys
 
-sys.path.insert(1, str(pathlib.Path(__file__).parents[2]))
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+sys.path.insert(1, str(pathlib.Path(__file__).parents[2]))
 
 from scripts.default_parameters import get_default_parameters
 from scripts.plotting import plotting_utils
