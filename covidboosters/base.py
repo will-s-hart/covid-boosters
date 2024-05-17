@@ -174,8 +174,8 @@ class PeriodicIndividualSusceptibilityModel(IndividualSusceptibilityModel):
 
 class PopulationSusceptibilityModel:
     """
-    Class for simulating susceptibility under booster vaccination in a population with
-    heterogeneous antibody dynamics.
+    Class for simulating susceptibility under periodic booster vaccination in a
+    population with heterogeneous antibody dynamics.
     """
 
     def __init__(
