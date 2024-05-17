@@ -3,12 +3,12 @@ import itertools
 import pathlib
 import sys
 
-sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
-
 import joblib
 import numpy as np
 import pandas as pd
 import tqdm
+
+sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
 
 from covidboosters import OutbreakRiskModel
 from scripts import vaccination_example
@@ -47,22 +47,18 @@ def run_analyses(
     # Set up outbreak risk model and load susceptibility values with vaccination of all
     # individuals at time 0
     outbreak_risk_model = OutbreakRiskModel(**kwargs_outbreak_risk_model)
-    if load_path_susceptibility_all_0 is None:
-        raise ValueError(
-            "load_path_susceptibility_all_0 must be provided. If the susceptibility "
-            "values with vaccination of all individuals at time 0 are not available, "
-            "pass a path for a new file to be created to save the values."
-        )
-    if pathlib.Path(load_path_susceptibility_all_0).exists():
+    if (
+        load_path_susceptibility_all_0 is not None
+        and pathlib.Path(load_path_susceptibility_all_0).exists()
+    ):
         outbreak_risk_model.load_susceptibility_all_0(load_path_susceptibility_all_0)
     else:
         print(
             "Saved susceptibility values with vaccination of all individuals at time 0 "
-            "not found. Will be computed from scratch and saved for future use at the"
-            "provided path"
+            "not found (or 'load_path_susceptibility_all_0' not provided). Calculating "
+            "from scratch."
         )
         _ = outbreak_risk_model.susceptibility(np.arange(period))
-        outbreak_risk_model.save_susceptibility_all_0(load_path_susceptibility_all_0)
     # Grid of vaccination start times and durations
     step = 10
     vaccination_start_time_vals = np.arange(0, period + 1, step)
@@ -74,11 +70,11 @@ def run_analyses(
             vaccination_start_time,
             vaccination_start_time + vaccination_duration,
         ]
-        outbreak_risk_model_curr = copy.copy(outbreak_risk_model)
+        outbreak_risk_model_curr = copy.deepcopy(outbreak_risk_model)
         outbreak_risk_model_curr.update_vaccination_params(
             vaccination_time_range=vaccination_time_range
         )
-        cor_max = np.max(outbreak_risk_model.case_outbreak_risk(np.arange(period)))
+        cor_max = np.max(outbreak_risk_model_curr.case_outbreak_risk(np.arange(period)))
         return cor_max
 
     n_jobs = joblib.cpu_count(only_physical_cores=True)
