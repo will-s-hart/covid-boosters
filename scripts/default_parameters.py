@@ -13,7 +13,7 @@ def get_default_parameters():
     period = 360
     unvacc_rep_no_mean = 2.5  # with below, max is 3
     unvacc_rep_no_prop_var = 0.2
-    peak_transmission_time = 0
+    peak_transmission_time = 1
 
     generation_time_logmean = 0.979396480343543
     generation_time_logsd = 0.470500197316974
@@ -49,8 +49,8 @@ def get_default_parameters():
         "half_protection_antibody": 1000,
     }
 
-    vaccination_time_range = [270, 360]
-    proportion_vaccinated = 0.5
+    vaccination_time_range = [270, 345]
+    proportion_vaccinated = 1 / 3
     population_size = 1000
 
     sim_incidence_cutoff = 10
