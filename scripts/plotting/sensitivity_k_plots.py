@@ -42,12 +42,7 @@ def make_plots(k_index):
 
 
 if __name__ == "__main__":
-    if "snakemake" in globals():
-        _k_index = snakemake.wildcards["k_index"]  # noqa: F821
-        if _k_index != "default":
-            _k_index = int(_k_index)
+    for _k_index in ["default", 0, 1]:
         make_plots(k_index=_k_index)
-    else:
-        for _k_index in ["default", 0, 1]:
-            make_plots(_k_index)
+    if "snakemake" not in globals():
         plt.show()
