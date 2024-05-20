@@ -433,12 +433,27 @@ rule sensitivity_r0_mean_plots:
     input:
         "scripts/plotting/plotting_utils.py",
         "scripts/plotting/optimizing_vaccination_plots.py",
-        "results/sensitivity_r0_mean/grid_search_{r0_mean_index}.csv",
-        "results/sensitivity_r0_mean/best_{r0_mean_index}.csv",
-        "results/sensitivity_r0_mean/vaccination_time_range_best_{r0_mean_index}.csv",
+        expand(
+            "results/sensitivity_r0_mean/grid_search_{r0_mean_index}.csv",
+            r0_mean_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_r0_mean/best_{r0_mean_index}.csv",
+            r0_mean_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_r0_mean/vaccination_time_range_best_{r0_mean_index}.csv",
+            r0_mean_index=[0, 1],
+        ),
     output:
-        "figures/sensitivity_r0_mean/heatmap_{r0_mean_index}.svg",
-        "figures/sensitivity_r0_mean/best_{r0_mean_index}.svg",
+        expand(
+            "figures/sensitivity_r0_mean/heatmap_{r0_mean_index}.svg",
+            r0_mean_index=[0, 1],
+        ),
+        expand(
+            "figures/sensitivity_r0_mean/best_{r0_mean_index}.svg",
+            r0_mean_index=[0, 1],
+        ),
     script:
         "scripts/plotting/sensitivity_r0_mean_plots.py"
 
@@ -463,12 +478,27 @@ rule sensitivity_r0_var_plots:
     input:
         "scripts/plotting/plotting_utils.py",
         "scripts/plotting/optimizing_vaccination_plots.py",
-        "results/sensitivity_r0_var/grid_search_{r0_var_index}.csv",
-        "results/sensitivity_r0_var/best_{r0_var_index}.csv",
-        "results/sensitivity_r0_var/vaccination_time_range_best_{r0_var_index}.csv",
+        expand(
+            "results/sensitivity_r0_var/grid_search_{r0_var_index}.csv",
+            r0_var_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_r0_var/best_{r0_var_index}.csv",
+            r0_var_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_r0_var/vaccination_time_range_best_{r0_var_index}.csv",
+            r0_var_index=[0, 1],
+        ),
     output:
-        "figures/sensitivity_r0_var/heatmap_{r0_var_index}.svg",
-        "figures/sensitivity_r0_var/best_{r0_var_index}.svg",
+        expand(
+            "figures/sensitivity_r0_var/heatmap_{r0_var_index}.svg",
+            r0_var_index=[0, 1],
+        ),
+        expand(
+            "figures/sensitivity_r0_var/best_{r0_var_index}.svg",
+            r0_var_index=[0, 1],
+        ),
     script:
         "scripts/plotting/sensitivity_r0_var_plots.py"
 
@@ -489,31 +519,34 @@ rule sensitivity_k:
         "scripts/sensitivity_k.py"
 
 
-def sensitivity_k_plots_input(wildcards):
-    if wildcards.k_index == "default":
-        return [
-            "scripts/plotting/plotting_utils.py",
-            "scripts/plotting/optimizing_vaccination_plots.py",
-            "results/optimizing_vaccination/grid_search.csv",
-            "results/optimizing_vaccination/best.csv",
-            "results/optimizing_vaccination/vaccination_time_range_best.csv",
-        ]
-    else:
-        return [
-            "scripts/plotting/plotting_utils.py",
-            "scripts/plotting/optimizing_vaccination_plots.py",
-            f"results/sensitivity_k/grid_search_{wildcards.k_index}.csv",
-            f"results/sensitivity_k/best_{wildcards.k_index}.csv",
-            f"results/sensitivity_k/vaccination_time_range_best_{wildcards.k_index}.csv",
-        ]
-
-
 rule sensitivity_k_plots:
     input:
-        sensitivity_k_plots_input,
+        "scripts/plotting/plotting_utils.py",
+        "scripts/plotting/optimizing_vaccination_plots.py",
+        "results/optimizing_vaccination/grid_search.csv",
+        "results/optimizing_vaccination/best.csv",
+        "results/optimizing_vaccination/vaccination_time_range_best.csv",
+        expand(
+            "results/sensitivity_k/grid_search_{k_index}.csv",
+            k_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_k/best_{k_index}.csv",
+            k_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_k/vaccination_time_range_best_{k_index}.csv",
+            k_index=[0, 1],
+        ),
     output:
-        "figures/sensitivity_k/heatmap_{k_index}.svg",
-        "figures/sensitivity_k/best_{k_index}.svg",
+        expand(
+            "figures/sensitivity_k/heatmap_{k_index}.svg",
+            k_index=[0, 1, "default"],
+        ),
+        expand(
+            "figures/sensitivity_k/best_{k_index}.svg",
+            k_index=[0, 1, "default"],
+        ),
     script:
         "scripts/plotting/sensitivity_k_plots.py"
 
@@ -538,12 +571,27 @@ rule sensitivity_prop_vacc_plots:
     input:
         "scripts/plotting/plotting_utils.py",
         "scripts/plotting/optimizing_vaccination_plots.py",
-        "results/sensitivity_prop_vacc/grid_search_{prop_vacc_index}.csv",
-        "results/sensitivity_prop_vacc/best_{prop_vacc_index}.csv",
-        "results/sensitivity_prop_vacc/vaccination_time_range_best_{prop_vacc_index}.csv",
+        expand(
+            "results/sensitivity_prop_vacc/grid_search_{prop_vacc_index}.csv",
+            prop_vacc_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_prop_vacc/best_{prop_vacc_index}.csv",
+            prop_vacc_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_prop_vacc/vaccination_time_range_best_{prop_vacc_index}.csv",
+            prop_vacc_index=[0, 1],
+        ),
     output:
-        "figures/sensitivity_prop_vacc/heatmap_{prop_vacc_index}.svg",
-        "figures/sensitivity_prop_vacc/best_{prop_vacc_index}.svg",
+        expand(
+            "figures/sensitivity_prop_vacc/best_{prop_vacc_index}.svg",
+            prop_vacc_index=[0, 1],
+        ),
+        expand(
+            "figures/sensitivity_prop_vacc/heatmap_{prop_vacc_index}.svg",
+            prop_vacc_index=[0, 1],
+        ),
     script:
         "scripts/plotting/sensitivity_prop_vacc_plots.py"
 
@@ -569,13 +617,34 @@ rule sensitivity_vacc_effect_plots:
     input:
         "scripts/plotting/plotting_utils.py",
         "scripts/plotting/optimizing_vaccination_plots.py",
-        "results/sensitivity_vacc_effect/within_host_{half_protection_antibody_index}.csv",
-        "results/sensitivity_vacc_effect/grid_search_{half_protection_antibody_index}.csv",
-        "results/sensitivity_vacc_effect/best_{half_protection_antibody_index}.csv",
-        "results/sensitivity_vacc_effect/vaccination_time_range_best_{half_protection_antibody_index}.csv",
+        expand(
+            "results/sensitivity_vacc_effect/within_host_{half_protection_antibody_index}.csv",
+            half_protection_antibody_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_vacc_effect/grid_search_{half_protection_antibody_index}.csv",
+            half_protection_antibody_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_vacc_effect/best_{half_protection_antibody_index}.csv",
+            half_protection_antibody_index=[0, 1],
+        ),
+        expand(
+            "results/sensitivity_vacc_effect/vaccination_time_range_best_{half_protection_antibody_index}.csv",
+            half_protection_antibody_index=[0, 1],
+        ),
     output:
-        "figures/sensitivity_vacc_effect/susceptibility_{half_protection_antibody_index}.svg",
-        "figures/sensitivity_vacc_effect/heatmap_{half_protection_antibody_index}.svg",
-        "figures/sensitivity_vacc_effect/best_{half_protection_antibody_index}.svg",
+        expand(
+            "figures/sensitivity_vacc_effect/susceptibility_{half_protection_antibody_index}.svg",
+            half_protection_antibody_index=[0, 1],
+        ),
+        expand(
+            "figures/sensitivity_vacc_effect/heatmap_{half_protection_antibody_index}.svg",
+            half_protection_antibody_index=[0, 1],
+        ),
+        expand(
+            "figures/sensitivity_vacc_effect/best_{half_protection_antibody_index}.svg",
+            half_protection_antibody_index=[0, 1],
+        ),
     script:
         "scripts/plotting/sensitivity_vacc_effect_plots.py"
