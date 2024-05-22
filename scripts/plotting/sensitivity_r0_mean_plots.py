@@ -62,8 +62,9 @@ def make_plots():
         )
     r0_plot_list = [r0_plot_list[0], r0_plot_list[2], r0_plot_list[1]]
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
+    ax.set_ylim(0, 4)
     ax.set_ylabel("Instantaneous reproduction number")
-    ax.legend(r0_plot_list, [p.get_label() for p in r0_plot_list], loc="upper right")
+    ax.legend(r0_plot_list, [p.get_label() for p in r0_plot_list], loc="lower right")
     fig.savefig(figure_dir / "reproduction_number.pdf")
     fig.savefig(figure_dir / "reproduction_number.svg")
 
