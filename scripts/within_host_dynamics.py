@@ -6,7 +6,7 @@ import pandas as pd
 
 sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
 
-from covidboosters import IndividualSusceptibilityModel
+from covidboosters import PeriodicIndividualSusceptibilityModel
 from scripts.default_parameters import get_default_parameters
 
 
@@ -18,10 +18,11 @@ def run_analyses(save_path, **kwargs_individual_susceptibility_model_in):
     antibody_model_params_random_effects = default_parameters[
         "antibody_model_params_random_effects"
     ]
+    susceptibility_func_params = default_parameters["susceptibility_func_params"]
     rng = np.random.default_rng(seed=2)
-    time_vec = np.arange(period)
-    antibodies_mat = np.zeros((period, population_size))
-    susceptibility_mat = np.zeros((period, population_size))
+    time_vec = np.arange(period + 1)
+    antibodies_mat = np.zeros((period + 1, population_size))
+    susceptibility_mat = np.zeros((period + 1, population_size))
     for individual_no in range(population_size):
         antibody_model_params = {}
         for param_name, param_pop in antibody_model_params_pop.items():
@@ -30,14 +31,13 @@ def run_analyses(save_path, **kwargs_individual_susceptibility_model_in):
                 param_random_effect * rng.standard_normal()
             )
         kwargs_individual_susceptibility_model = {
-            "susceptibility_func_params": default_parameters[
-                "susceptibility_func_params"
-            ],
+            "period": period,
+            "susceptibility_func_params": susceptibility_func_params,
             "vaccination_times": 0,
             **kwargs_individual_susceptibility_model_in,
             "antibody_model_params": antibody_model_params,
         }
-        individual_susceptibility_model = IndividualSusceptibilityModel(
+        individual_susceptibility_model = PeriodicIndividualSusceptibilityModel(
             **kwargs_individual_susceptibility_model
         )
         antibodies_mat[:, individual_no] = individual_susceptibility_model.antibodies(
