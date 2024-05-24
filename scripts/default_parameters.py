@@ -45,7 +45,7 @@ def get_default_parameters():
     #     * (omicron_reduction_factor / vaccine_adaptation_factor),
     # }
     susceptibility_func_params = {
-        "antibody_response_steepness": 3.2 / np.log(10),
+        "antibody_response_steepness": 3.1 / np.log(10),
         "half_protection_antibody": 1000,
     }
 
