@@ -118,23 +118,23 @@ rule supp:
         ),
         expand(
             "results/sensitivity_prop_vacc/grid_search_{prop_vacc_index}.csv",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "results/sensitivity_prop_vacc/best_{prop_vacc_index}.csv",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "results/sensitivity_prop_vacc/vaccination_time_range_best_{prop_vacc_index}.csv",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "figures/sensitivity_prop_vacc/heatmap_{prop_vacc_index}.svg",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "figures/sensitivity_prop_vacc/best_{prop_vacc_index}.svg",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "results/sensitivity_vacc_effect/within_host_{half_protection_antibody_index}.csv",
@@ -206,15 +206,15 @@ rule supp_results:
         ),
         expand(
             "results/sensitivity_prop_vacc/grid_search_{prop_vacc_index}.csv",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "results/sensitivity_prop_vacc/best_{prop_vacc_index}.csv",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "results/sensitivity_prop_vacc/vaccination_time_range_best_{prop_vacc_index}.csv",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "results/sensitivity_vacc_effect/within_host_{half_protection_antibody_index}.csv",
@@ -262,11 +262,11 @@ rule supp_figures:
         ),
         expand(
             "figures/sensitivity_prop_vacc/heatmap_{prop_vacc_index}.svg",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "figures/sensitivity_prop_vacc/best_{prop_vacc_index}.svg",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "figures/sensitivity_vacc_effect/susceptibility_{half_protection_antibody_index}.svg",
@@ -573,24 +573,24 @@ rule sensitivity_prop_vacc_plots:
         "scripts/plotting/optimizing_vaccination_plots.py",
         expand(
             "results/sensitivity_prop_vacc/grid_search_{prop_vacc_index}.csv",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "results/sensitivity_prop_vacc/best_{prop_vacc_index}.csv",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "results/sensitivity_prop_vacc/vaccination_time_range_best_{prop_vacc_index}.csv",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
     output:
         expand(
             "figures/sensitivity_prop_vacc/best_{prop_vacc_index}.svg",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
         expand(
             "figures/sensitivity_prop_vacc/heatmap_{prop_vacc_index}.svg",
-            prop_vacc_index=[0, 1],
+            prop_vacc_index=[0, 1, 2],
         ),
     script:
         "scripts/plotting/sensitivity_prop_vacc_plots.py"
