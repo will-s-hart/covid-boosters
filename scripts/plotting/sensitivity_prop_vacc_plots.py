@@ -32,7 +32,7 @@ def make_plots(prop_vacc_index):
 
 
 if __name__ == "__main__":
-    for _prop_vacc_index in range(2):
+    for _prop_vacc_index in range(3):
         make_plots(prop_vacc_index=_prop_vacc_index)
     if "snakemake" not in globals():
         plt.show()
