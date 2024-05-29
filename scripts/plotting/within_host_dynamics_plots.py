@@ -35,7 +35,7 @@ def make_plots(plot_ci=True):
         )
         ax.set_ylim(0, 14000)
     ax.set_xlabel("Time since vaccination (days)")
-    ax.set_ylabel("Antibody titre (AU)")
+    ax.set_ylabel("IgG(S) antibody titre (AU/mL)")
     plt.savefig(figure_dir / "antibodies.pdf")
     plt.savefig(figure_dir / "antibodies.svg")
     # Plot susceptibility dynamics following vaccination
