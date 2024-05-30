@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
 
-from scripts import optimizing_vaccination, within_host_dynamics
+from scripts import optimizing_vaccination, vaccination_example, within_host_dynamics
 from scripts.default_parameters import get_default_parameters
 
 half_protection_antibody_vals = [500, 2000]
@@ -15,6 +15,7 @@ def run_analyses(half_protection_antibody_index):
     save_path_within_host = (
         results_dir / f"within_host_{half_protection_antibody_index}.csv"
     )
+    save_path_default = results_dir / f"default_{half_protection_antibody_index}.csv"
     save_path_grid_search = (
         results_dir / f"grid_search_{half_protection_antibody_index}.csv"
     )
@@ -22,6 +23,9 @@ def run_analyses(half_protection_antibody_index):
     save_path_vaccination_time_range_best = (
         results_dir
         / f"vaccination_time_range_best_{half_protection_antibody_index}.csv"
+    )
+    save_path_susceptibility_all_0 = (
+        results_dir / f"susceptibility_all_0_{half_protection_antibody_index}.csv"
     )
     susceptibility_func_params = {
         **get_default_parameters()["susceptibility_func_params"],
@@ -32,12 +36,18 @@ def run_analyses(half_protection_antibody_index):
     within_host_dynamics.run_analyses(
         save_path=save_path_within_host,
         susceptibility_func_params=susceptibility_func_params,
+        save_path_susceptibility_all_0=save_path_susceptibility_all_0,
+    )
+    vaccination_example.run_analyses(
+        save_path=save_path_default,
+        load_path_susceptibility_all_0=save_path_susceptibility_all_0,
+        susceptibility_func_params=susceptibility_func_params,
     )
     optimizing_vaccination.run_analyses(
         save_path=save_path_grid_search,
         save_path_best=save_path_best,
         save_path_vaccination_time_range_best=save_path_vaccination_time_range_best,
-        load_path_susceptibility_all_0=None,
+        load_path_susceptibility_all_0=save_path_susceptibility_all_0,
         susceptibility_func_params=susceptibility_func_params,
     )
 
