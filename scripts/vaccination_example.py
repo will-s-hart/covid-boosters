@@ -67,5 +67,5 @@ if __name__ == "__main__":
     results_dir.mkdir(exist_ok=True, parents=True)
     run_analyses(
         save_path=results_dir / "vaccination_example.csv",
-        save_path_susceptibility_all_0=results_dir / "susceptibility_all_0.csv",
+        load_path_susceptibility_all_0=results_dir / "susceptibility_all_0.csv",
     )

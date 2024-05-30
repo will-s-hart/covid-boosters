@@ -10,7 +10,11 @@ from covidboosters import PeriodicIndividualSusceptibilityModel
 from scripts.default_parameters import get_default_parameters
 
 
-def run_analyses(save_path, **kwargs_individual_susceptibility_model_in):
+def run_analyses(
+    save_path,
+    save_path_susceptibility_all_0=None,
+    **kwargs_individual_susceptibility_model_in,
+):
     default_parameters = get_default_parameters()
     period = default_parameters["period"]
     population_size = default_parameters["population_size"]
@@ -20,9 +24,9 @@ def run_analyses(save_path, **kwargs_individual_susceptibility_model_in):
     ]
     susceptibility_func_params = default_parameters["susceptibility_func_params"]
     rng = np.random.default_rng(seed=2)
-    time_vec = np.arange(period + 1)
-    antibodies_mat = np.zeros((period + 1, population_size))
-    susceptibility_mat = np.zeros((period + 1, population_size))
+    time_vec = np.arange(period)
+    antibodies_mat = np.zeros((period, population_size))
+    susceptibility_mat = np.zeros((period, population_size))
     for individual_no in range(population_size):
         antibody_model_params = {}
         for param_name, param_pop in antibody_model_params_pop.items():
@@ -58,9 +62,15 @@ def run_analyses(save_path, **kwargs_individual_susceptibility_model_in):
     df["susceptibility_95ci_upper"] = np.percentile(susceptibility_mat, 97.5, axis=1)
     # Save the results
     df.to_csv(save_path)
+    if save_path_susceptibility_all_0 is not None:
+        df_susceptibility_all_0 = df["susceptibility_mean"].rename("susceptibility")
+        df_susceptibility_all_0.to_csv(save_path_susceptibility_all_0)
 
 
 if __name__ == "__main__":
     results_dir = pathlib.Path(__file__).parents[1] / "results"
     results_dir.mkdir(exist_ok=True, parents=True)
-    run_analyses(save_path=results_dir / "within_host_dynamics.csv")
+    run_analyses(
+        save_path=results_dir / "within_host_dynamics.csv",
+        save_path_susceptibility_all_0=results_dir / "susceptibility_all_0.csv",
+    )
