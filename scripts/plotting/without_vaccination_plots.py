@@ -54,7 +54,7 @@ def make_plots():
         )
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(0, 1)
-    ax.set_ylabel("Outbreak risk")
+    ax.set_ylabel("Case outbreak risk")
     ax.legend(loc="upper right")
     plt.savefig(figure_dir / "outbreak_risk_dispersion.pdf")
     plt.savefig(figure_dir / "outbreak_risk_dispersion.svg")
