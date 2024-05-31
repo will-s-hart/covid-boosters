@@ -56,9 +56,7 @@ if __name__ == "__main__":
     if "snakemake" in globals():
         run_analyses(
             half_protection_antibody_index=int(
-                snakemake.wildcards[  # noqa: F821
-                    "half_protection_antibody_index"
-                ]
+                snakemake.wildcards["index"]  # noqa: F821
             ),
         )
     else:

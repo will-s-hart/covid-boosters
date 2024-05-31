@@ -37,7 +37,7 @@ def run_analyses(r0_mean_index):
 if __name__ == "__main__":
     if "snakemake" in globals():
         run_analyses(
-            r0_mean_index=int(snakemake.wildcards["r0_mean_index"]),  # noqa: F821
+            r0_mean_index=int(snakemake.wildcards["index"]),  # noqa: F821
         )
     else:
         for _r0_mean_index in range(len(r0_mean_vals)):

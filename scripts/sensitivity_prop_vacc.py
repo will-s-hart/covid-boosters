@@ -37,7 +37,7 @@ def run_analyses(prop_vacc_index):
 if __name__ == "__main__":
     if "snakemake" in globals():
         run_analyses(
-            prop_vacc_index=int(snakemake.wildcards["prop_vacc_index"]),  # noqa: F821
+            prop_vacc_index=int(snakemake.wildcards["index"]),  # noqa: F821
         )
     else:
         for _prop_vacc_index in range(len(prop_vacc_vals)):

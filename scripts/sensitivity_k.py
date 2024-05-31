@@ -39,7 +39,7 @@ def run_analyses(k_index):
 if __name__ == "__main__":
     if "snakemake" in globals():
         run_analyses(
-            k_index=int(snakemake.wildcards["k_index"]),  # noqa: F821
+            k_index=int(snakemake.wildcards["index"]),  # noqa: F821
         )
     else:
         for _k_index in range(len(k_vals)):
