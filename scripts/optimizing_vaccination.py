@@ -20,6 +20,7 @@ def run_analyses(
     save_path_best=None,
     save_path_vaccination_time_range_best=None,
     load_path_susceptibility_all_0=None,
+    obj_func=np.max,
     **kwargs_outbreak_risk_model,
 ):
     default_parameters = get_default_parameters()
@@ -74,8 +75,9 @@ def run_analyses(
         outbreak_risk_model_curr.update_vaccination_params(
             vaccination_time_range=vaccination_time_range
         )
-        cor_max = np.max(outbreak_risk_model_curr.case_outbreak_risk(np.arange(period)))
-        return cor_max
+        cor_vec = outbreak_risk_model_curr.case_outbreak_risk(np.arange(period))
+        obj_val = obj_func(cor_vec)
+        return obj_val
 
     n_jobs = joblib.cpu_count(only_physical_cores=True)
     print(f"Scanning over start times and durations using {n_jobs} cores")
