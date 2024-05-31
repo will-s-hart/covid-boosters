@@ -39,7 +39,7 @@ def run_analyses(
     kwargs_outbreak_risk_model.update(kwargs_outbreak_risk_model_in)
     period = kwargs_outbreak_risk_model["period"]
     time_vec = np.arange(2 * period)
-    # Example of COR with vaccination
+    # Example of COR and IOR with vaccination
     outbreak_risk_model = OutbreakRiskModel(**kwargs_outbreak_risk_model)
     if load_path_susceptibility_all_0 is not None:
         outbreak_risk_model.load_susceptibility_all_0(load_path_susceptibility_all_0)
@@ -49,11 +49,13 @@ def run_analyses(
     df["r"] = outbreak_risk_model.reproduction_no(time_vec)
     df["susceptibility"] = outbreak_risk_model.susceptibility(time_vec)
     df["cor"] = outbreak_risk_model.case_outbreak_risk(time_vec)
+    df["ior"] = outbreak_risk_model.instantaneous_outbreak_risk(time_vec)
     # Corresponding COR values with no vaccination
     outbreak_risk_model_unvacc = OutbreakRiskModel(
         **{**kwargs_outbreak_risk_model, "proportion_vaccinated": 0}
     )
     df["cor_unvacc"] = outbreak_risk_model_unvacc.case_outbreak_risk(time_vec)
+    df["ior_unvacc"] = outbreak_risk_model_unvacc.instantaneous_outbreak_risk(time_vec)
     # Save the results
     if save_path is not None:
         df.to_csv(save_path)
