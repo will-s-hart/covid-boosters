@@ -44,15 +44,15 @@ def setup_figure_with_cbar():
 def months_x_axis(ax, period=360, no_periods=2):
     if period != 360:
         raise NotImplementedError("Only period=360 is currently supported.")
-    month_starts = np.arange(0, period + 1, period // 12)
-    month_list = ["Jan", "", "", "Apr", "", "", "Jul", "", "", "Oct", "", "", "Jan"]
+    month_starts = np.arange(0, period, period // 12)
+    month_list = ["Jan", "", "", "Apr", "", "", "Jul", "", "", "Oct", "", ""]
     ax.set_xlim(0, no_periods * period)
     ax.set_xticks(
-        (
-            month_starts[:, np.newaxis].T
-            + period * np.arange(no_periods)[:, np.newaxis]
-        ).flatten(),
-        labels=month_list * no_periods,
+        (month_starts[:, np.newaxis].T + period * np.arange(no_periods)[:, np.newaxis])
+        .flatten()
+        .tolist()
+        + [period * no_periods],
+        labels=month_list * no_periods + ["Jan"],
     )
     ax.set_xlabel(" ")
 
