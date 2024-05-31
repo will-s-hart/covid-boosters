@@ -61,6 +61,8 @@ def make_plots():
             figure_path_best=figure_dir / f"best_{k_index}.svg",
             show_plots=False,
             ylim_best=(0, 0.6),
+            kwargs_best_unvacc={"color": color, "linestyle": "--", "alpha": 0.75},
+            kwargs_best_vacc={"color": color},
         )
     plotting_utils.months_x_axis(ax_cor_default, period=period, no_periods=2)
     ax_cor_default.set_ylim(0, 0.6)

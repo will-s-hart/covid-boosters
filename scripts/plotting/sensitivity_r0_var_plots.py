@@ -80,6 +80,8 @@ def make_plots():
             figure_path_heatmap=figure_dir / f"heatmap_{r0_var_index}.svg",
             figure_path_best=figure_dir / f"best_{r0_var_index}.svg",
             show_plots=False,
+            kwargs_best_unvacc={"color": color, "linestyle": "--", "alpha": 0.75},
+            kwargs_best_vacc={"color": color},
         )
     # Format and save reproduction number plot
     plotting_utils.months_x_axis(ax_r0, period=period, no_periods=2)

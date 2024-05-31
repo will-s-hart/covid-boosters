@@ -21,7 +21,16 @@ def make_plots(
     figure_path_best,
     show_plots=True,
     ylim_best=(0, 0.5),
+    kwargs_best_unvacc=None,
+    kwargs_best_vacc=None,
+    kwargs_heatmap=None,
 ):
+    kwargs_best_unvacc = {"label": "Without vaccination", **(kwargs_best_unvacc or {})}
+    kwargs_best_vacc = {"label": "Optimised vaccination", **(kwargs_best_vacc or {})}
+    kwargs_heatmap = {
+        "cbar_kws": {"label": "Maximum case outbreak risk"},
+        **(kwargs_heatmap or {}),
+    }
     plotting_utils.set_sns_theme()
     # Load the results
     df_grid_search = pd.read_csv(load_path, index_col=0).rename_axis("duration", axis=1)
@@ -34,13 +43,18 @@ def make_plots(
     default_parameters = get_default_parameters()
     period = default_parameters["period"]
     # Plot heatmap of max COR for different vaccination start times and durations
-    make_heatmap_plot(df_grid_search, vaccination_time_range_best, period=period)
+    make_heatmap_plot(
+        df_grid_search,
+        vaccination_time_range_best,
+        period=period,
+        **kwargs_heatmap,
+    )
     plt.savefig(figure_path_heatmap)
     plt.savefig(str(figure_path_heatmap).replace(".svg", ".pdf"))
     # Plot COR with and without vaccination
     _, ax = plotting_utils.setup_figure()
-    df_best["cor_unvacc"].plot(ax=ax, label="Without vaccination")
-    df_best["cor"].plot(ax=ax, label="With vaccination")
+    df_best["cor_unvacc"].plot(ax=ax, **kwargs_best_unvacc)
+    df_best["cor"].plot(ax=ax, **kwargs_best_vacc)
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(ylim_best)
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range_best)
@@ -53,7 +67,12 @@ def make_plots(
         plt.show()
 
 
-def make_heatmap_plot(df_grid_search, vaccination_time_range_best, period=360):
+def make_heatmap_plot(
+    df_grid_search,
+    vaccination_time_range_best,
+    period=360,
+    **kwargs_heatmap,
+):
     if period != 360:
         raise NotImplementedError("Only period=360 is currently supported.")
     _, ax, cbar_ax = plotting_utils.setup_figure_with_cbar()
@@ -63,7 +82,7 @@ def make_heatmap_plot(df_grid_search, vaccination_time_range_best, period=360):
         cbar_ax=cbar_ax,
         rasterized=True,
         cmap="viridis",
-        cbar_kws={"label": "Maximum case outbreak risk"},
+        **kwargs_heatmap,
     )
     ax.invert_yaxis()
     xticks = ax.get_xticks()
