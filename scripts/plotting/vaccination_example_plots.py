@@ -47,7 +47,7 @@ def make_plots():
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(0, 0.5)
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range)
-    ax.set_ylabel("Case outbreak risk")
+    ax.set_ylabel("Outbreak risk")
     ax.legend()
     plt.savefig(figure_dir / "outbreak_risk.pdf")
     plt.savefig(figure_dir / "outbreak_risk.svg")

@@ -11,14 +11,14 @@ sys.path.insert(1, str(pathlib.Path(__file__).parents[2]))
 from scripts.plotting import optimizing_vaccination_plots
 
 obj_func_name_dict = {
-    "baseline": "Maximum case outbreak risk",
-    "mean": "Mean case outbreak risk",
-    "weighted_mean": "Weighted mean case outbreak risk",
-    "dec_jan_mean": "Dec-Jan mean case outbreak risk",
-    "max_mean_comb1": "Max + (1/3) * mean case outbreak risk",
-    "max_mean_comb2": "Max + mean case outbreak risk",
-    "max_mean_comb3": "Max + 3 * mean case outbreak risk",
-    "max_dec_jan_mean_comb": "Max + Dec-Jan mean case outbreak risk",
+    "baseline": "Maximum outbreak risk",
+    "mean": "Mean outbreak risk",
+    "weighted_mean": "Weighted mean outbreak risk",
+    "dec_jan_mean": "Dec-Jan mean outbreak risk",
+    "max_mean_comb1": "Max + (1/3) * mean outbreak risk",
+    "max_mean_comb2": "Max + mean outbreak risk",
+    "max_mean_comb3": "Max + 3 * mean outbreak risk",
+    "max_dec_jan_mean_comb": "Max + Dec-Jan mean outbreak risk",
 }
 
 

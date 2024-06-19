@@ -99,7 +99,7 @@ def make_plots():
     plotting_utils.shade_vaccination_time_range(
         ax_cor_default, vaccination_time_range_default
     )
-    ax_cor_default.set_ylabel("Case outbreak risk")
+    ax_cor_default.set_ylabel("Outbreak risk")
     ax_cor_default.legend(loc="lower right")
     fig_cor_default.savefig(figure_dir / "default.pdf")
     fig_cor_default.savefig(figure_dir / "default.svg")

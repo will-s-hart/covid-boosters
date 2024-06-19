@@ -28,7 +28,7 @@ def make_plots(
     kwargs_best_unvacc = {"label": "Without vaccination", **(kwargs_best_unvacc or {})}
     kwargs_best_vacc = {"label": "Optimised vaccination", **(kwargs_best_vacc or {})}
     kwargs_heatmap = {
-        "cbar_kws": {"label": "Maximum case outbreak risk"},
+        "cbar_kws": {"label": "Maximum outbreak risk"},
         **(kwargs_heatmap or {}),
     }
     plotting_utils.set_sns_theme()
@@ -58,7 +58,7 @@ def make_plots(
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(ylim_best)
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range_best)
-    ax.set_ylabel("Case outbreak risk")
+    ax.set_ylabel("Outbreak risk")
     ax.legend()
     plt.savefig(figure_path_best)
     plt.savefig(str(figure_path_best).replace(".svg", ".pdf"))
