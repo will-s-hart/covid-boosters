@@ -3,7 +3,6 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 sys.path.insert(1, str(pathlib.Path(__file__).parents[2]))
 
@@ -13,7 +12,7 @@ from scripts.plotting import plotting_utils
 
 def make_plots():
     plotting_utils.set_sns_theme()
-    figure_dir = pathlib.Path(__file__).parents[2] / "figures/input"
+    figure_dir = pathlib.Path(__file__).parents[2] / "figures/model_input"
     figure_dir.mkdir(exist_ok=True, parents=True)
     # Load the inputs
     default_parameters = get_default_parameters()
