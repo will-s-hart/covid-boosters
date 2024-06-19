@@ -21,7 +21,7 @@ def make_plots():
     period = default_parameters["period"]
     vaccination_time_range_default = default_parameters["vaccination_time_range"]
     fig_cor_default, ax_cor_default = plotting_utils.setup_figure()
-    for prop_vacc_index in [0, 1, "baseline", 2]:
+    for prop_vacc_index in [0, "baseline", 1]:
         if prop_vacc_index == "baseline":
             proportion_vaccinated = default_parameters["proportion_vaccinated"]
             color = color_palette[0]
@@ -75,7 +75,7 @@ def make_plots():
     plotting_utils.shade_vaccination_time_range(
         ax_cor_default, vaccination_time_range_default
     )
-    ax_cor_default.set_ylabel("Case outbreak risk")
+    ax_cor_default.set_ylabel("Outbreak risk")
     ax_cor_default.legend(loc="lower right")
     fig_cor_default.savefig(figure_dir / "default.pdf")
     fig_cor_default.savefig(figure_dir / "default.svg")

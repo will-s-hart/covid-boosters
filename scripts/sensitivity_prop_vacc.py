@@ -5,7 +5,7 @@ sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
 
 from scripts import optimizing_vaccination, vaccination_example
 
-prop_vacc_vals = [0.2, 0.4, 0.8]
+prop_vacc_vals = [0.4, 0.8]
 
 
 def run_analyses(prop_vacc_index):
