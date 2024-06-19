@@ -25,7 +25,7 @@ def set_sns_theme():
         "ytick.labelsize": 16,
         "legend.fontsize": 14,
     }
-    sns.set_theme(style="ticks", rc=rc_params)
+    sns.set_theme(style="ticks", palette="colorblind", rc=rc_params)
 
 
 def setup_figure():

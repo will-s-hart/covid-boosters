@@ -59,7 +59,7 @@ def make_plots(
     ax.set_ylim(ylim_best)
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range_best)
     ax.set_ylabel("Outbreak risk")
-    ax.legend()
+    ax.legend(loc="lower right")
     plt.savefig(figure_path_best)
     plt.savefig(str(figure_path_best).replace(".svg", ".pdf"))
     # Show plots if not running from snakemake

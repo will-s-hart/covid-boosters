@@ -14,7 +14,7 @@ from scripts.plotting import optimizing_vaccination_plots, plotting_utils
 
 def make_plots():
     plotting_utils.set_sns_theme()
-    color_palette = sns.color_palette()
+    color_palette = sns.color_palette("colorblind")
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/sensitivity_prop_vacc"
     figure_dir.mkdir(exist_ok=True, parents=True)
     default_parameters = get_default_parameters()

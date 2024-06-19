@@ -20,7 +20,7 @@ def make_plots():
     # Plot comparison of individual reproduction number distributions for different
     # values of the dispersion parameter
     dispersion_param_vals = [0.1, default_parameters["dispersion_param"], 1, 10, 100]
-    color_vals = [sns.color_palette()[i] for i in [2, 0, 1, 3, 7]]
+    color_vals = [sns.color_palette("colorblind")[i] for i in [3, 0, 2, 1, 9]]
     inf_factor_vec = np.linspace(0, 40, 10000)
     _, ax = plotting_utils.setup_figure()
     for dispersion_param, color in zip(dispersion_param_vals, color_vals):

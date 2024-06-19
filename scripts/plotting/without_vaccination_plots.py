@@ -16,7 +16,7 @@ def make_plots():
     results_dir = pathlib.Path(__file__).parents[2] / "results/without_vaccination"
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/without_vaccination"
     figure_dir.mkdir(exist_ok=True, parents=True)
-    colors = [sns.color_palette()[i] for i in [2, 0, 1, 3, 7]]
+    colors = [sns.color_palette("colorblind")[i] for i in [3, 0, 2, 1, 9]]
     # Load the results
     df_reproduction_number = pd.read_csv(
         results_dir / "reproduction_number.csv", index_col="time"
