@@ -39,10 +39,10 @@ def get_default_parameters():
 
     vaccination_time_range = [270, 345]
     proportion_vaccinated = 0.6
-    population_size = 1000
+    population_size = 10000
 
-    sim_incidence_cutoff = 10
-    no_simulations = 5000
+    sim_incidence_cutoff = 20
+    no_simulations = 20000
 
     default_parameters = {
         "period": period,
