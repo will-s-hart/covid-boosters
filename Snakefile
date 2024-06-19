@@ -91,7 +91,7 @@ def get_supp_results_files(wildcards):
 
 def get_supp_figures_files(wildcards):
     supp_figures_files = (
-        ["figures/model_input/generation_time_dist.svg"]
+        ["figures/model_input/generation_time.svg"]
         + expand(
             "figures/superspreading/{figure}.svg",
             figure=["infectiousness_factors", "transmission_proportions"],
@@ -357,7 +357,7 @@ rule model_input_plots:
         "scripts/plotting/plotting_utils.py",
         "scripts/default_parameters.py",
     output:
-        "figures/model_input/generation_time_dist.svg",
+        "figures/model_input/generation_time.svg",
     script:
         "scripts/plotting/model_input_plots.py"
 
