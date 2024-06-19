@@ -25,7 +25,7 @@ def run_analyses(
     susceptibility_func_params = default_parameters["susceptibility_func_params"]
     rng = np.random.default_rng(seed=2)
     time_vec = np.arange(period)
-    antibodies_mat = np.zeros((period, population_size))
+    log10_antibodies_mat = np.zeros((period, population_size))
     susceptibility_mat = np.zeros((period, population_size))
     for individual_no in range(population_size):
         antibody_model_params = {}
@@ -44,18 +44,20 @@ def run_analyses(
         individual_susceptibility_model = PeriodicIndividualSusceptibilityModel(
             **kwargs_individual_susceptibility_model
         )
-        antibodies_mat[:, individual_no] = individual_susceptibility_model.antibodies(
-            time_vec
+        log10_antibodies_mat[:, individual_no] = np.log10(
+            individual_susceptibility_model.antibodies(time_vec)
         )
         susceptibility_mat[:, individual_no] = (
             individual_susceptibility_model.susceptibility(time_vec)
         )
     df = pd.DataFrame({"time": time_vec})
     df.set_index("time", inplace=True)
-    df["antibodies_mean"] = np.mean(antibodies_mat, axis=1)
-    df["antibodies_median"] = np.median(antibodies_mat, axis=1)
-    df["antibodies_95ci_lower"] = np.percentile(antibodies_mat, 2.5, axis=1)
-    df["antibodies_95ci_upper"] = np.percentile(antibodies_mat, 97.5, axis=1)
+    df["log10_antibodies_mean"] = np.mean(log10_antibodies_mat, axis=1)
+    df["log10_antibodies_median"] = np.median(log10_antibodies_mat, axis=1)
+    df["log10_antibodies_95ci_lower"] = np.percentile(log10_antibodies_mat, 2.5, axis=1)
+    df["log10_antibodies_95ci_upper"] = np.percentile(
+        log10_antibodies_mat, 97.5, axis=1
+    )
     df["susceptibility_mean"] = np.mean(susceptibility_mat, axis=1)
     df["susceptibility_median"] = np.median(susceptibility_mat, axis=1)
     df["susceptibility_95ci_lower"] = np.percentile(susceptibility_mat, 2.5, axis=1)
