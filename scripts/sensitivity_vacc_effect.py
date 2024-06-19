@@ -44,7 +44,7 @@ def run_analyses(half_protection_antibody_index):
         susceptibility_func_params=susceptibility_func_params,
     )
     optimizing_vaccination.run_analyses(
-        save_path=save_path_grid_search,
+        save_path_grid_search=save_path_grid_search,
         save_path_best=save_path_best,
         save_path_vaccination_time_range_best=save_path_vaccination_time_range_best,
         load_path_susceptibility_all_0=save_path_susceptibility_all_0,

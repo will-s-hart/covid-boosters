@@ -26,7 +26,7 @@ def run_analyses(prop_vacc_index):
         proportion_vaccinated=prop_vacc_vals[prop_vacc_index],
     )
     optimizing_vaccination.run_analyses(
-        save_path=save_path_grid_search,
+        save_path_grid_search=save_path_grid_search,
         save_path_best=save_path_best,
         save_path_vaccination_time_range_best=save_path_vaccination_time_range_best,
         load_path_susceptibility_all_0=load_path_susceptibility_all_0,

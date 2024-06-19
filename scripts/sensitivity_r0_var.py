@@ -26,7 +26,7 @@ def run_analyses(r0_var_index):
         unvaccinated_reproduction_no_prop_variation=r0_var_vals[r0_var_index],
     )
     optimizing_vaccination.run_analyses(
-        save_path=save_path_grid_search,
+        save_path_grid_search=save_path_grid_search,
         save_path_best=save_path_best,
         save_path_vaccination_time_range_best=save_path_vaccination_time_range_best,
         load_path_susceptibility_all_0=load_path_susceptibility_all_0,

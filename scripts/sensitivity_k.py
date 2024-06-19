@@ -28,7 +28,7 @@ def run_analyses(k_index):
         dispersion_param=k_vals[k_index],
     )
     optimizing_vaccination.run_analyses(
-        save_path=save_path_grid_search,
+        save_path_grid_search=save_path_grid_search,
         save_path_best=save_path_best,
         save_path_vaccination_time_range_best=save_path_vaccination_time_range_best,
         load_path_susceptibility_all_0=load_path_susceptibility_all_0,
