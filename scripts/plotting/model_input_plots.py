@@ -30,7 +30,6 @@ def make_plots():
     ax.set_xticks(np.arange(0, 11, 2))
     ax.set_xlabel("Generation time (days)")
     ax.set_ylabel("Probability")
-    plt.savefig(figure_dir / "generation_time.pdf")
     plt.savefig(figure_dir / "generation_time.svg")
     # Show plots
     if "snakemake" not in globals():

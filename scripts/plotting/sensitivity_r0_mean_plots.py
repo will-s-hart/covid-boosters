@@ -91,7 +91,6 @@ def make_plots():
     ax_r0.set_ylim(0, 4)
     ax_r0.set_ylabel("Instantaneous reproduction number")
     ax_r0.legend(loc="lower right")
-    fig_r0.savefig(figure_dir / "reproduction_number.pdf")
     fig_r0.savefig(figure_dir / "reproduction_number.svg")
     # Format and save default COR plot
     plotting_utils.months_x_axis(ax_cor_default, period=period, no_periods=2)
@@ -101,7 +100,6 @@ def make_plots():
     )
     ax_cor_default.set_ylabel("Outbreak risk")
     ax_cor_default.legend(loc="lower right")
-    fig_cor_default.savefig(figure_dir / "default.pdf")
     fig_cor_default.savefig(figure_dir / "default.svg")
 
 

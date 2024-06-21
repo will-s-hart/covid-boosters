@@ -41,7 +41,6 @@ def make_plots():
     ax.set_xlabel("Individual infectiousness factor, $\\alpha$")
     ax.set_ylabel("Density")
     ax.legend()  # loc="upper right")
-    plt.savefig(figure_dir / "infectiousness_factors.pdf")
     plt.savefig(figure_dir / "infectiousness_factors.svg")
     # Plot contribution to transmission vs proportion of cases for different values of
     # the dispersion parameter
@@ -67,7 +66,6 @@ def make_plots():
     ax.set_xlabel("Most infectious proportion of cases")
     ax.set_ylabel("Proportion of transmission")
     ax.legend()  # loc="upper right")
-    plt.savefig(figure_dir / "transmission_proportions.pdf")
     plt.savefig(figure_dir / "transmission_proportions.svg")
     if "snakemake" not in globals():
         plt.show()

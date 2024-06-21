@@ -77,7 +77,6 @@ def make_plots():
     )
     ax_cor_default.set_ylabel("Outbreak risk")
     ax_cor_default.legend(loc="lower right")
-    fig_cor_default.savefig(figure_dir / "default.pdf")
     fig_cor_default.savefig(figure_dir / "default.svg")
 
 

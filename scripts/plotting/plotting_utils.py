@@ -5,17 +5,12 @@ import seaborn as sns
 
 def set_sns_theme():
     rc_params = {
-        # "figure.autolayout": True,
         "figure.figsize": (6, 6),
-        # "figure.subplot.left": 0.2,
-        # "figure.subplot.right": 0.8,
-        # "figure.subplot.bottom": 0.15,
-        # "figure.subplot.top": 0.85,
         "axes.spines.top": False,
         "axes.spines.right": False,
         "axes.autolimit_mode": "round_numbers",
         "savefig.transparent": True,
-        "savefig.format": "pdf",
+        "savefig.format": "svg",
         "svg.fonttype": "none",
         "axes.titlesize": 16,
         "axes.labelsize": 16,

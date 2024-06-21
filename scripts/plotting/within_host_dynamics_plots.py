@@ -36,7 +36,6 @@ def make_plots(plot_ci=True):
         ax.set_ylim(0, 5)
     ax.set_xlabel("Time since vaccination (days)")
     ax.set_ylabel("log$_{10}$[IgG(S) antibody titre (AU/mL)]")
-    plt.savefig(figure_dir / "antibodies.pdf")
     plt.savefig(figure_dir / "antibodies.svg")
     # Plot susceptibility dynamics following vaccination
     _, ax = plotting_utils.setup_figure()
@@ -53,7 +52,6 @@ def make_plots(plot_ci=True):
         )
         ax.set_xlabel("Time since vaccination (days)")
     ax.set_ylabel("Relative susceptibility")
-    plt.savefig(figure_dir / "susceptibility.pdf")
     plt.savefig(figure_dir / "susceptibility.svg")
     # Show plots
     if "snakemake" not in globals():

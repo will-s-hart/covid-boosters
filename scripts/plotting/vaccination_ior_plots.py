@@ -35,7 +35,6 @@ def make_plots():
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range)
     ax.set_ylabel("Outbreak risk")
     ax.legend()
-    plt.savefig(figure_dir / "outbreak_risk.pdf")
     plt.savefig(figure_dir / "outbreak_risk.svg")
     # Show plots
     if "snakemake" not in globals():

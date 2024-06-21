@@ -101,7 +101,6 @@ def make_plots():
     ax_sus.set_xlabel("Time since vaccination (days)")
     ax_sus.set_ylabel("Relative susceptibility")
     ax_sus.legend(loc="lower right")
-    fig_sus.savefig(figure_dir / "susceptibility.pdf")
     fig_sus.savefig(figure_dir / "susceptibility.svg")
     # Format and save default COR plot
     plotting_utils.months_x_axis(ax_cor_default, period=period, no_periods=2)
@@ -111,7 +110,6 @@ def make_plots():
     )
     ax_cor_default.set_ylabel("Outbreak risk")
     ax_cor_default.legend(loc="lower right")
-    fig_cor_default.savefig(figure_dir / "default.pdf")
     fig_cor_default.savefig(figure_dir / "default.svg")
 
 

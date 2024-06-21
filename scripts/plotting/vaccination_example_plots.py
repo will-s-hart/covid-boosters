@@ -27,7 +27,6 @@ def make_plots():
     ax.set_ylim(0, 1)
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range)
     ax.set_ylabel("Average susceptibility")
-    plt.savefig(figure_dir / "susceptibility.pdf")
     plt.savefig(figure_dir / "susceptibility.svg")
     # Plot reproduction number with and without vaccination
     _, ax = plotting_utils.setup_figure()
@@ -38,7 +37,6 @@ def make_plots():
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range)
     ax.set_ylabel("Instantaneous reproduction number")
     ax.legend(loc="lower right")
-    plt.savefig(figure_dir / "reproduction_number.pdf")
     plt.savefig(figure_dir / "reproduction_number.svg")
     # Plot COR with and without vaccination
     _, ax = plotting_utils.setup_figure()
@@ -49,7 +47,6 @@ def make_plots():
     plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range)
     ax.set_ylabel("Outbreak risk")
     ax.legend(loc="lower right")
-    plt.savefig(figure_dir / "outbreak_risk.pdf")
     plt.savefig(figure_dir / "outbreak_risk.svg")
     # Show plots
     if "snakemake" not in globals():

@@ -30,7 +30,6 @@ def make_plots():
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(0, 3.02)
     ax.set_ylabel("Instantaneous reproduction number")
-    plt.savefig(figure_dir / "reproduction_number.pdf")
     plt.savefig(figure_dir / "reproduction_number.svg")
     # Plot comparison of COR/SOR values for different values of the dispersion parameter
     _, ax = plotting_utils.setup_figure()
@@ -45,7 +44,6 @@ def make_plots():
     ax.set_ylim(0, 1)
     ax.set_ylabel("Outbreak risk")
     ax.legend(loc="upper right")
-    plt.savefig(figure_dir / "outbreak_risk.pdf")
     plt.savefig(figure_dir / "outbreak_risk.svg")
     # Show plots
     if "snakemake" not in globals():

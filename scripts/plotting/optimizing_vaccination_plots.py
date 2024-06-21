@@ -50,7 +50,6 @@ def make_plots(
         **kwargs_heatmap,
     )
     plt.savefig(figure_path_heatmap)
-    plt.savefig(str(figure_path_heatmap).replace(".svg", ".pdf"))
     # Plot COR with and without vaccination
     _, ax = plotting_utils.setup_figure()
     df_best["cor_unvacc"].plot(ax=ax, **kwargs_best_unvacc)
@@ -61,7 +60,6 @@ def make_plots(
     ax.set_ylabel("Outbreak risk")
     ax.legend(loc="lower right")
     plt.savefig(figure_path_best)
-    plt.savefig(str(figure_path_best).replace(".svg", ".pdf"))
     # Show plots if not running from snakemake
     if show_plots:
         plt.show()
