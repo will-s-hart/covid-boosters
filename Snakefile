@@ -1,167 +1,84 @@
-def get_results_files(wildcards):
-    results_files = (
-        [
-            "results/antibody_model_params.csv",
-            "results/without_vaccination/reproduction_number.csv",
-            "results/without_vaccination/analytic.csv",
-            "results/without_vaccination/simulated.csv",
-            "results/within_host_dynamics.csv",
-            "results/vaccination_example.csv",
-            "results/susceptibility_all_0.csv",
-            "results/optimizing_vaccination/grid_search.csv",
-            "results/optimizing_vaccination/best.csv",
-            "results/optimizing_vaccination/vaccination_time_range_best.csv",
-        ]
-        + expand(
-            "results/sensitivity_k/{result}_{index}.csv",
-            result=["default", "grid_search", "best", "vaccination_time_range_best"],
-            index=[0, 1],
-        )
-        + expand(
-            "results/sensitivity_prop_vacc/{result}_{index}.csv",
-            result=["default", "grid_search", "best", "vaccination_time_range_best"],
-            index=[0, 1],
-        )
-    )
-    return results_files
-
-
-def get_figures_files(wildcards):
-    figures_files = (
-        [
-            "figures/without_vaccination/reproduction_number.svg",
-            "figures/without_vaccination/outbreak_risk.svg",
-            "figures/within_host_dynamics/antibodies.svg",
-            "figures/within_host_dynamics/susceptibility.svg",
-            "figures/vaccination_example/susceptibility.svg",
-            "figures/vaccination_example/reproduction_number.svg",
-            "figures/vaccination_example/outbreak_risk.svg",
-            "figures/optimizing_vaccination/heatmap.svg",
-            "figures/optimizing_vaccination/best.svg",
-            "figures/sensitivity_k/default.svg",
-            "figures/sensitivity_prop_vacc/default.svg",
-        ]
-        + expand(
-            "figures/sensitivity_k/{figure}_{index}.svg",
-            figure=["best", "heatmap"],
-            index=[0, 1, "baseline"],
-        )
-        + expand(
-            "figures/sensitivity_prop_vacc/{figure}_{index}.svg",
-            figure=["best", "heatmap"],
-            index=[0, 1, "baseline"],
-        )
-    )
-    return figures_files
-
-
-def get_main_files(wildcards):
-    results_files = get_results_files(wildcards)
-    figures_files = get_figures_files(wildcards)
-    all_files = results_files + figures_files
-    return all_files
-
-
-def get_supp_results_files(wildcards):
-    supp_results_files = (
-        expand(
-            "results/sensitivity_r0_mean/{result}_{index}.csv",
-            result=["default", "grid_search", "best", "vaccination_time_range_best"],
-            index=[0, 1],
-        )
-        + expand(
-            "results/sensitivity_r0_var/{result}_{index}.csv",
-            result=["default", "grid_search", "best", "vaccination_time_range_best"],
-            index=[0, 1],
-        )
-        + expand(
-            "results/sensitivity_vacc_effect/{result}_{index}.csv",
-            result=[
-                "within_host",
-                "default",
-                "grid_search",
-                "best",
-                "vaccination_time_range_best",
-            ],
-            index=[0, 1],
-        )
-    )
-    return supp_results_files
-
-
-def get_supp_figures_files(wildcards):
-    supp_figures_files = (
-        ["figures/model_input/generation_time.svg"]
-        + expand(
-            "figures/superspreading/{figure}.svg",
-            figure=["infectiousness_factors", "transmission_proportions"],
-        )
-        + expand(
-            "figures/sensitivity_r0_mean/{figure}.svg",
-            figure=["reproduction_number", "default"],
-        )
-        + expand(
-            "figures/sensitivity_r0_mean/{figure}_{index}.svg",
-            figure=["best", "heatmap"],
-            index=[0, 1, "baseline"],
-        )
-        + expand(
-            "figures/sensitivity_r0_var/{figure}.svg",
-            figure=["reproduction_number", "default"],
-        )
-        + expand(
-            "figures/sensitivity_r0_var/{figure}_{index}.svg",
-            figure=["best", "heatmap"],
-            index=[0, 1, "baseline"],
-        )
-        + expand(
-            "figures/sensitivity_vacc_effect/{figure}.svg",
-            figure=["susceptibility", "default"],
-        )
-        + expand(
-            "figures/sensitivity_vacc_effect/{figure}_{index}.svg",
-            figure=["best", "heatmap"],
-            index=[0, 1],
-        )
-    )
-    return supp_figures_files
-
-
-def get_supp_files(wildcards):
-    supp_results_files = get_supp_results_files(wildcards)
-    supp_figures_files = get_supp_figures_files(wildcards)
-    supp_files = supp_results_files + supp_figures_files
-    return supp_files
-
-
-rule main:
-    input:
-        get_main_files,
-
-
-rule results:
-    input:
-        get_results_files,
-
-
 rule figures:
     input:
-        get_figures_files,
-
-
-rule supp:
-    input:
-        get_supp_files,
-
-
-rule supp_results:
-    input:
-        get_supp_results_files,
+        "figures/paper_figures/fig1.pdf",
+        "figures/paper_figures/fig2.pdf",
+        "figures/paper_figures/fig3.pdf",
+        "figures/paper_figures/fig4.pdf",
+        "figures/paper_figures/fig5.pdf",
 
 
 rule supp_figures:
     input:
-        get_supp_figures_files,
+        "figures/paper_supp_figures/figS1.pdf",
+        "figures/paper_supp_figures/figS2.pdf",
+        "figures/paper_supp_figures/figS3.pdf",
+        "figures/paper_supp_figures/figS4.pdf",
+        "figures/paper_supp_figures/figS5.pdf",
+
+
+rule figures_svg:
+    input:
+        "figures/without_vaccination/reproduction_number.svg",
+        "figures/without_vaccination/outbreak_risk.svg",
+        "figures/within_host_dynamics/antibodies.svg",
+        "figures/within_host_dynamics/susceptibility.svg",
+        "figures/vaccination_example/susceptibility.svg",
+        "figures/vaccination_example/reproduction_number.svg",
+        "figures/vaccination_example/outbreak_risk.svg",
+        "figures/optimizing_vaccination/heatmap.svg",
+        "figures/optimizing_vaccination/best.svg",
+        "figures/sensitivity_k/default.svg",
+        "figures/sensitivity_k/best_0.svg",
+        "figures/sensitivity_k/best_1.svg",
+        "figures/sensitivity_prop_vacc/default.svg",
+        "figures/sensitivity_prop_vacc/best_0.svg",
+        "figures/sensitivity_prop_vacc/best_1.svg",
+    output:
+        "figures/paper_figures/fig1.svg",
+        "figures/paper_figures/fig2.svg",
+        "figures/paper_figures/fig3.svg",
+        "figures/paper_figures/fig4.svg",
+        "figures/paper_figures/fig5.svg",
+    script:
+        "scripts/plotting/paper_figures.py"
+
+
+rule supp_figures_svg:
+    input:
+        "figures/model_input/generation_time.svg",
+        "figures/superspreading/infectiousness_factors.svg",
+        "figures/superspreading/transmission_proportions.svg",
+        "figures/sensitivity_r0_mean/reproduction_number.svg",
+        "figures/sensitivity_r0_mean/default.svg",
+        "figures/sensitivity_r0_mean/best_0.svg",
+        "figures/sensitivity_r0_mean/best_1.svg",
+        "figures/sensitivity_r0_var/reproduction_number.svg",
+        "figures/sensitivity_r0_var/default.svg",
+        "figures/sensitivity_r0_var/best_0.svg",
+        "figures/sensitivity_r0_var/best_1.svg",
+        "figures/sensitivity_vacc_effect/susceptibility.svg",
+        "figures/sensitivity_vacc_effect/default.svg",
+        "figures/sensitivity_vacc_effect/best_0.svg",
+        "figures/sensitivity_vacc_effect/best_1.svg",
+    output:
+        "figures/paper_supp_figures/figS1.svg",
+        "figures/paper_supp_figures/figS2.svg",
+        "figures/paper_supp_figures/figS3.svg",
+        "figures/paper_supp_figures/figS4.svg",
+        "figures/paper_supp_figures/figS5.svg",
+    script:
+        "scripts/plotting/paper_supp_figures.py"
+
+
+rule svg_to_pdf:
+    input:
+        "figures/paper_figures/fig{fig_no}.svg",
+    output:
+        "figures/paper_figures/fig{fig_no}.pdf",
+    wildcard_constraints:
+        fig_no="(\d+|S\d+)",
+    shell:
+        "inkscape --export-type=pdf --export-filename={output} {input}"
 
 
 rule format_antibody_model_param_estimates:
