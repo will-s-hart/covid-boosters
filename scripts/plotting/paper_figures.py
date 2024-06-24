@@ -1,7 +1,6 @@
 import pathlib
 from math import ceil
 
-import cairosvg
 import svgutils.transform as svgt
 
 FIGURE_DIR = pathlib.Path(__file__).parents[2] / "figures/paper_figures"
