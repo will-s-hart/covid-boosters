@@ -65,7 +65,7 @@ def make_plots():
     ax.set_ylim(0, 1.01)
     ax.set_xlabel("Most infectious proportion of cases")
     ax.set_ylabel("Proportion of transmission")
-    ax.legend()  # loc="upper right")
+    ax.legend()
     plt.savefig(figure_dir / "transmission_proportions.svg")
     if "snakemake" not in globals():
         plt.show()
