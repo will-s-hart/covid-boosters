@@ -70,13 +70,20 @@ rule supp_figures_svg:
         "scripts/plotting/paper_supp_figures.py"
 
 
-rule svg_to_pdf:
+rule fig_svg_to_pdf:
     input:
         "figures/paper_figures/fig{fig_no}.svg",
     output:
         "figures/paper_figures/fig{fig_no}.pdf",
-    wildcard_constraints:
-        fig_no="(\d+|S\d+)",
+    shell:
+        "inkscape --export-type=pdf --export-filename={output} {input}"
+
+
+rule supp_fig_svg_to_pdf:
+    input:
+        "figures/paper_supp_figures/fig{fig_no}.svg",
+    output:
+        "figures/paper_supp_figures/fig{fig_no}.pdf",
     shell:
         "inkscape --export-type=pdf --export-filename={output} {input}"
 
