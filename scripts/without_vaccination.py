@@ -16,7 +16,7 @@ def run_analyses():
     time_vec = np.arange(2 * period)
     time_vec_sor = np.arange(2 * period, step=30)
     kwargs_outbreak_risk_model = {
-        "period": default_parameters["period"],
+        "period": period,
         "peak_transmission_time": default_parameters["peak_transmission_time"],
         "generation_time_dist": default_parameters["generation_time_dist"],
         "unvaccinated_reproduction_no_mean": 2,
