@@ -84,7 +84,7 @@ def make_fig2():
         panel_dir / "antibodies.svg",
         panel_dir / "susceptibility.svg",
     ]
-    panel_sz = (340, 335)
+    panel_sz = (DEFAULTS["panel_sz"][0], 335)
     make_figure(save_path, panel_paths, panel_sz=panel_sz)
 
 
