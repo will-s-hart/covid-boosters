@@ -20,6 +20,13 @@ def make_plots():
     default_parameters = get_default_parameters()
     period = default_parameters["period"]
     vaccination_time_range = default_parameters["vaccination_time_range"]
+    # Plot reproduction number without vaccination
+    _, ax = plotting_utils.setup_figure()
+    df["r_unvacc"].plot(ax=ax, label="")
+    plotting_utils.months_x_axis(ax, period=period, no_periods=2)
+    ax.set_ylim(0, 3.02)
+    ax.set_ylabel("Instantaneous reproduction number\n(no vaccination)")
+    plt.savefig(figure_dir / "unvaccinated_reproduction_number.svg")
     # Plot population-average susceptibility
     _, ax = plotting_utils.setup_figure()
     df["susceptibility"].plot(ax=ax)
@@ -30,7 +37,7 @@ def make_plots():
     plt.savefig(figure_dir / "susceptibility.svg")
     # Plot reproduction number with and without vaccination
     _, ax = plotting_utils.setup_figure()
-    df["r_unvacc"].plot(ax=ax, label="Without vaccination")
+    df["r_unvacc"].plot(ax=ax, style="--", label="Without vaccination")
     df["r"].plot(ax=ax, label="With vaccination")
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(0, 3.02)
@@ -40,7 +47,7 @@ def make_plots():
     plt.savefig(figure_dir / "reproduction_number.svg")
     # Plot COR with and without vaccination
     _, ax = plotting_utils.setup_figure()
-    df["cor_unvacc"].plot(ax=ax, label="Without vaccination")
+    df["cor_unvacc"].plot(ax=ax, style="--", label="Without vaccination")
     df["cor"].plot(ax=ax, label="With vaccination")
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(0, 0.5)
