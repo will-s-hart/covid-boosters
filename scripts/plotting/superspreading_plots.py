@@ -38,7 +38,7 @@ def make_plots():
     )
     ax.set_xlim(0, 3)
     ax.set_ylim(0, 5)
-    ax.set_xlabel("Individual infectiousness factor, $\\alpha$")
+    ax.set_xlabel("Relative individual infectiousness, $\\alpha$")
     ax.set_ylabel("Density")
     ax.legend()  # loc="upper right")
     plt.savefig(figure_dir / "infectiousness_factors.svg")
@@ -64,7 +64,7 @@ def make_plots():
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1.01)
     ax.set_xlabel("Most infectious proportion of cases")
-    ax.set_ylabel("Proportion of transmission")
+    ax.set_ylabel("Proportion of transmissions")
     ax.legend()
     plt.savefig(figure_dir / "transmission_proportions.svg")
     if "snakemake" not in globals():

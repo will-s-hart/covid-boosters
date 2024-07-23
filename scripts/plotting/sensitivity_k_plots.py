@@ -50,7 +50,9 @@ def make_plots():
             ax=ax_cor_default, label="", color=color, linestyle="--", alpha=0.75
         )
         df["cor"].plot(
-            ax=ax_cor_default, label="$\\it{k}$ = " + f"{dispersion_param}", color=color
+            ax=ax_cor_default,
+            label="$\\it{k}$ = " + f"{dispersion_param:.2f}",
+            color=color,
         )
         # Make plots for optimization of vaccination
         optimizing_vaccination_plots.make_plots(
