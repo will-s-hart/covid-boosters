@@ -1,28 +1,34 @@
 rule figures:
     input:
-        "figures/paper_figures/fig1.pdf",
-        "figures/paper_figures/fig2.pdf",
-        "figures/paper_figures/fig3.pdf",
-        "figures/paper_figures/fig4.pdf",
-        "figures/paper_figures/fig5.pdf",
+        expand(
+            "figures/paper_figures/fig{fig_no}.{extension}",
+            fig_no=range(1, 5),
+            extension=["pdf", "png"],
+        ),
 
 
 rule supp_figures:
     input:
-        "figures/paper_supp_figures/figS1.pdf",
-        "figures/paper_supp_figures/figS2.pdf",
-        "figures/paper_supp_figures/figS3.pdf",
-        "figures/paper_supp_figures/figS4.pdf",
-        "figures/paper_supp_figures/figS5.pdf",
+        expand(
+            "figures/paper_supp_figures/figS{fig_no}.{extension}",
+            fig_no=range(1, 5),
+            extension=["pdf", "png"],
+        ),
 
 
 rule figures_svg:
     input:
+        "figures/paper_figures/templates/fig1_template.svg",
         "figures/without_vaccination/reproduction_number.svg",
+        "figures/superspreading/infectiousness_factors.svg",
+        "figures/model_input/generation_time.svg",
+        "figures/simulation_examples/simulations.svg",
         "figures/without_vaccination/outbreak_risk.svg",
+        "figures/paper_figures/templates/fig2_template.svg",
         "figures/within_host_dynamics/antibodies.svg",
         "figures/within_host_dynamics/susceptibility.svg",
         "figures/vaccination_example/susceptibility.svg",
+        "figures/vaccination_example/unvaccinated_reproduction_number.svg",
         "figures/vaccination_example/reproduction_number.svg",
         "figures/vaccination_example/outbreak_risk.svg",
         "figures/optimizing_vaccination/heatmap.svg",
@@ -38,15 +44,13 @@ rule figures_svg:
         "figures/paper_figures/fig2.svg",
         "figures/paper_figures/fig3.svg",
         "figures/paper_figures/fig4.svg",
-        "figures/paper_figures/fig5.svg",
     script:
         "scripts/plotting/paper_figures.py"
 
 
 rule supp_figures_svg:
     input:
-        "figures/model_input/generation_time.svg",
-        "figures/superspreading/infectiousness_factors.svg",
+        "scripts/plotting/paper_figures.py",
         "figures/superspreading/transmission_proportions.svg",
         "figures/sensitivity_r0_mean/reproduction_number.svg",
         "figures/sensitivity_r0_mean/default.svg",
@@ -65,7 +69,6 @@ rule supp_figures_svg:
         "figures/paper_supp_figures/figS2.svg",
         "figures/paper_supp_figures/figS3.svg",
         "figures/paper_supp_figures/figS4.svg",
-        "figures/paper_supp_figures/figS5.svg",
     script:
         "scripts/plotting/paper_supp_figures.py"
 
@@ -79,6 +82,15 @@ rule fig_svg_to_pdf:
         "inkscape --export-type=pdf --export-filename={output} {input}"
 
 
+rule fig_svg_to_png:
+    input:
+        "figures/paper_figures/fig{fig_no}.svg",
+    output:
+        "figures/paper_figures/fig{fig_no}.png",
+    shell:
+        "inkscape --export-type=png --export-filename={output} {input}"
+
+
 rule supp_fig_svg_to_pdf:
     input:
         "figures/paper_supp_figures/fig{fig_no}.svg",
@@ -86,6 +98,15 @@ rule supp_fig_svg_to_pdf:
         "figures/paper_supp_figures/fig{fig_no}.pdf",
     shell:
         "inkscape --export-type=pdf --export-filename={output} {input}"
+
+
+rule supp_fig_svg_to_png:
+    input:
+        "figures/paper_supp_figures/fig{fig_no}.svg",
+    output:
+        "figures/paper_supp_figures/fig{fig_no}.png",
+    shell:
+        "inkscape --export-type=png --export-filename={output} {input}"
 
 
 rule format_antibody_model_param_estimates:
@@ -100,7 +121,6 @@ rule format_antibody_model_param_estimates:
 
 rule without_vaccination:
     input:
-        "results/antibody_model_params.csv",
         "scripts/default_parameters.py",
         "covidboosters/base.py",
     output:
@@ -122,6 +142,49 @@ rule without_vaccination_plots:
         "figures/without_vaccination/outbreak_risk.svg",
     script:
         "scripts/plotting/without_vaccination_plots.py"
+
+
+rule model_input_plots:
+    input:
+        "scripts/plotting/plotting_utils.py",
+        "scripts/default_parameters.py",
+    output:
+        "figures/model_input/generation_time.svg",
+    script:
+        "scripts/plotting/model_input_plots.py"
+
+
+rule superspreading_plots:
+    input:
+        "scripts/plotting/plotting_utils.py",
+        "scripts/default_parameters.py",
+    output:
+        expand(
+            "figures/superspreading/{figure}.svg",
+            figure=["infectiousness_factors", "transmission_proportions"],
+        ),
+    script:
+        "scripts/plotting/superspreading_plots.py"
+
+
+rule simulation_examples:
+    input:
+        "scripts/default_parameters.py",
+        "covidboosters/base.py",
+    output:
+        "results/simulation_examples/simulations.csv",
+    script:
+        "scripts/simulation_examples.py"
+
+
+rule simulation_examples_plots:
+    input:
+        "scripts/plotting/plotting_utils.py",
+        "results/simulation_examples/simulations.csv",
+    output:
+        "figures/simulation_examples/simulations.svg",
+    script:
+        "scripts/plotting/simulation_examples_plots.py"
 
 
 rule within_host_dynamics:
@@ -220,6 +283,7 @@ rule sensitivity_k_plots:
     input:
         "scripts/plotting/plotting_utils.py",
         "scripts/plotting/optimizing_vaccination_plots.py",
+        "results/vaccination_example.csv",
         "results/optimizing_vaccination/grid_search.csv",
         "results/optimizing_vaccination/best.csv",
         "results/optimizing_vaccination/vaccination_time_range_best.csv",
@@ -260,6 +324,10 @@ rule sensitivity_prop_vacc_plots:
     input:
         "scripts/plotting/plotting_utils.py",
         "scripts/plotting/optimizing_vaccination_plots.py",
+        "results/vaccination_example.csv",
+        "results/optimizing_vaccination/grid_search.csv",
+        "results/optimizing_vaccination/best.csv",
+        "results/optimizing_vaccination/vaccination_time_range_best.csv",
         expand(
             "results/sensitivity_prop_vacc/{result}_{index}.csv",
             result=["default", "grid_search", "best", "vaccination_time_range_best"],
@@ -274,29 +342,6 @@ rule sensitivity_prop_vacc_plots:
         ),
     script:
         "scripts/plotting/sensitivity_prop_vacc_plots.py"
-
-
-rule model_input_plots:
-    input:
-        "scripts/plotting/plotting_utils.py",
-        "scripts/default_parameters.py",
-    output:
-        "figures/model_input/generation_time.svg",
-    script:
-        "scripts/plotting/model_input_plots.py"
-
-
-rule superspreading_plots:
-    input:
-        "scripts/plotting/plotting_utils.py",
-        "scripts/default_parameters.py",
-    output:
-        expand(
-            "figures/superspreading/{figure}.svg",
-            figure=["infectiousness_factors", "transmission_proportions"],
-        ),
-    script:
-        "scripts/plotting/superspreading_plots.py"
 
 
 rule sensitivity_r0_mean:
@@ -320,6 +365,10 @@ rule sensitivity_r0_mean_plots:
     input:
         "scripts/plotting/plotting_utils.py",
         "scripts/plotting/optimizing_vaccination_plots.py",
+        "results/vaccination_example.csv",
+        "results/optimizing_vaccination/grid_search.csv",
+        "results/optimizing_vaccination/best.csv",
+        "results/optimizing_vaccination/vaccination_time_range_best.csv",
         expand(
             "results/sensitivity_r0_mean/{result}_{index}.csv",
             result=["default", "grid_search", "best", "vaccination_time_range_best"],
@@ -360,6 +409,10 @@ rule sensitivity_r0_var_plots:
     input:
         "scripts/plotting/plotting_utils.py",
         "scripts/plotting/optimizing_vaccination_plots.py",
+        "results/vaccination_example.csv",
+        "results/optimizing_vaccination/grid_search.csv",
+        "results/optimizing_vaccination/best.csv",
+        "results/optimizing_vaccination/vaccination_time_range_best.csv",
         expand(
             "results/sensitivity_r0_var/{result}_{index}.csv",
             result=["default", "grid_search", "best", "vaccination_time_range_best"],
@@ -401,6 +454,11 @@ rule sensitivity_vacc_effect_plots:
     input:
         "scripts/plotting/plotting_utils.py",
         "scripts/plotting/optimizing_vaccination_plots.py",
+        "results/within_host_dynamics.csv",
+        "results/vaccination_example.csv",
+        "results/optimizing_vaccination/grid_search.csv",
+        "results/optimizing_vaccination/best.csv",
+        "results/optimizing_vaccination/vaccination_time_range_best.csv",
         expand(
             "results/sensitivity_vacc_effect/{result}_{index}.csv",
             result=[
