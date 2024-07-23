@@ -16,7 +16,7 @@ def make_plots():
     results_dir = pathlib.Path(__file__).parents[2] / "results/without_vaccination"
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/without_vaccination"
     figure_dir.mkdir(exist_ok=True, parents=True)
-    colors = [sns.color_palette("colorblind")[i] for i in [3, 0, 2, 1, 9]]
+    colors = [sns.color_palette("colorblind")[i] for i in [3, 0, 2, 1, 9]] + ["black"]
     # Load the results
     df_reproduction_number = pd.read_csv(
         results_dir / "reproduction_number.csv", index_col="time"
@@ -27,6 +27,7 @@ def make_plots():
     # Plot instantaneous reproduction number
     _, ax = plotting_utils.setup_figure()
     df_reproduction_number["r"].plot(ax=ax)
+    ax.plot(90, df_reproduction_number["r"][90], "o", color="black", markersize=10)
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(0, 3.02)
     ax.set_ylabel("Instantaneous reproduction number")
@@ -34,12 +35,17 @@ def make_plots():
     # Plot comparison of COR/SOR values for different values of the dispersion parameter
     _, ax = plotting_utils.setup_figure()
     for dispersion_param, color in zip(df_analytic.columns, colors):
-        df_analytic[dispersion_param].plot(
-            color=color, label="$\\it{k}$ = " + dispersion_param
-        )
+        if float(dispersion_param) > 100000:
+            style = "--"
+            label = "$\\it{k}$ = $\\infty$"
+        else:
+            style = "-"
+            label = "$\\it{k}$ = " + dispersion_param
+        df_analytic[dispersion_param].plot(color=color, style=style, label=label)
         df_simulated[dispersion_param].plot(
             color=color, style="o", markersize=5, alpha=0.5, label=""
         )
+    ax.plot(90, df_analytic["0.41"][90], "o", color="black", markersize=10)
     plotting_utils.months_x_axis(ax, period=period, no_periods=2)
     ax.set_ylim(0, 1)
     ax.set_ylabel("Outbreak risk")
