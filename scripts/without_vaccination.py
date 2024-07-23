@@ -34,7 +34,14 @@ def run_analyses():
         dispersion_param=1, **kwargs_outbreak_risk_model
     ).reproduction_no(time_vec)
     # Comparison of COR/SOR values for different values of the dispersion parameter
-    dispersion_param_vals = [0.1, default_parameters["dispersion_param"], 1, 10, 100]
+    dispersion_param_vals = [
+        0.1,
+        default_parameters["dispersion_param"],
+        1,
+        10,
+        100,
+        1000000,
+    ]
     df_analytic = pd.DataFrame({"time": time_vec})
     df_analytic.set_index("time", inplace=True)
     df_simulated = pd.DataFrame({"time": time_vec_sor})
