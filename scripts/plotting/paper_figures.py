@@ -9,16 +9,23 @@ DEFAULTS = {
     "panel_sz": (340, 320),
     "panel_offset": (-25, -60),
     "label_offset": (5, 20),
+    "label_size": 20,
 }
 
 
 def make_figure(
     save_path,
     panel_paths,
+    template_path=None,
+    sz=None,
     tiling=None,
     panel_sz=None,
-    sz=None,
+    panel_offset=None,
     panel_positions=None,
+    panel_scalings=None,
+    label_strings=None,
+    label_size=None,
+    label_offset=None,
     label_positions=None,
 ):
     no_panels = len(panel_paths)
@@ -31,8 +38,9 @@ def make_figure(
         panel_sz = DEFAULTS["panel_sz"]
     if sz is None:
         sz = (panel_sz[0] * cols, panel_sz[1] * rows)
-    if panel_positions is None:
+    if panel_offset is None:
         panel_offset = DEFAULTS["panel_offset"]
+    if panel_positions is None:
         panel_positions = [
             (
                 panel_offset[0] + panel_sz[0] * (i % cols),
@@ -40,8 +48,15 @@ def make_figure(
             )
             for i in range(no_panels)
         ]
-    if label_positions is None:
+    if panel_scalings is None:
+        panel_scalings = [1] * no_panels
+    if label_strings is None:
+        label_strings = [chr(65 + i) + "." for i in range(no_panels)]
+    if label_size is None:
+        label_size = DEFAULTS["label_size"]
+    if label_offset is None:
         label_offset = DEFAULTS["label_offset"]
+    if label_positions is None:
         label_positions = [
             (
                 label_offset[0] + panel_sz[0] * (i % cols),
@@ -50,16 +65,25 @@ def make_figure(
             for i in range(no_panels)
         ]
     # create new SVG figure
-    fig = svgt.SVGFigure()
-    fig.set_size((str(sz[0]) + "px", str(sz[1]) + "px"))
+    if template_path is not None:
+        fig = svgt.fromfile(template_path)
+    else:
+        fig = svgt.SVGFigure()
+        fig.set_size((str(sz[0]) + "px", str(sz[1]) + "px"))
     # load matpotlib-generated figures
-    panels = [svgt.fromfile(path).getroot() for path in panel_paths]
-    for panel, position in zip(panels, panel_positions):
-        panel.moveto(position[0], position[1])
+    panels = []
+    for path in panel_paths:
+        if path is not None:
+            panel = svgt.fromfile(path).getroot()
+        else:
+            panel = svgt.TextElement(0, 0, "")
+        panels.append(panel)
+    for panel, position, scaling in zip(panels, panel_positions, panel_scalings):
+        panel.moveto(position[0], position[1], scale_x=scaling)
     # add text labels
     labels = [
-        svgt.TextElement(position[0], position[1], chr(65 + i) + ".", size=20)
-        for i, position in enumerate(label_positions)
+        svgt.TextElement(position[0], position[1], string, size=label_size)
+        for string, position in zip(label_strings, label_positions)
     ]
     # append plots and labels to figure
     fig.append(panels + labels)
@@ -69,38 +93,75 @@ def make_figure(
 
 def make_fig1():
     save_path = FIGURE_DIR / "fig1.svg"
-    panel_dir = pathlib.Path(__file__).parents[2] / "figures/without_vaccination"
+    panel_dir = pathlib.Path(__file__).parents[2] / "figures"
     panel_paths = [
-        panel_dir / "reproduction_number.svg",
-        panel_dir / "outbreak_risk.svg",
+        panel_dir / "without_vaccination/reproduction_number.svg",
+        panel_dir / "superspreading/infectiousness_factors.svg",
+        panel_dir / "model_input/generation_time.svg",
+        "figures/simulation_examples/simulations.svg",
+        None,
+        panel_dir / "without_vaccination/outbreak_risk.svg",
     ]
-    make_figure(save_path, panel_paths)
+    template_path = FIGURE_DIR / "templates/fig1_template.svg"
+    panel_sz = (360, 364)
+    panel_offset = (-20, -45)
+    panel_positions = [
+        (
+            panel_offset[0] + panel_sz[0] * (i % 3),
+            panel_offset[1] + panel_sz[1] * (i // 3),
+        )
+        for i in range(6)
+    ]
+    panel_positions[3] = (160, 225)
+    panel_scalings = [1, 1, 1, 4 / 3, 1, 1]
+    label_strings = [
+        "A. Time-dependent transmission",
+        "B. Heterogeneity in infectiousness",
+        "C. Generation time distribution",
+        "D. Outbreak risk calculation",
+        "",
+        "E. Outbreak risk values",
+    ]
+    label_size = 18
+    label_offset = (10, 25)
+    make_figure(
+        save_path,
+        panel_paths,
+        template_path=template_path,
+        panel_sz=panel_sz,
+        panel_positions=panel_positions,
+        panel_scalings=panel_scalings,
+        label_strings=label_strings,
+        label_size=label_size,
+        label_offset=label_offset,
+    )
 
 
 def make_fig2():
     save_path = FIGURE_DIR / "fig2.svg"
-    panel_dir = pathlib.Path(__file__).parents[2] / "figures/within_host_dynamics"
+    panel_dir = pathlib.Path(__file__).parents[2] / "figures"
     panel_paths = [
-        panel_dir / "antibodies.svg",
-        panel_dir / "susceptibility.svg",
+        panel_dir / "within_host_dynamics/antibodies.svg",
+        panel_dir / "within_host_dynamics/susceptibility.svg",
+        panel_dir / "vaccination_example/susceptibility.svg",
+        panel_dir / "vaccination_example/unvaccinated_reproduction_number.svg",
+        panel_dir / "vaccination_example/reproduction_number.svg",
+        panel_dir / "vaccination_example/outbreak_risk.svg",
     ]
-    panel_sz = (DEFAULTS["panel_sz"][0], 335)
-    make_figure(save_path, panel_paths, panel_sz=panel_sz)
+    template_path = FIGURE_DIR / "templates/fig2_template.svg"
+    panel_sz = (360, 340)
+    panel_offset = (-12.5, DEFAULTS["panel_offset"][1])
+    make_figure(
+        save_path,
+        panel_paths,
+        template_path=template_path,
+        panel_sz=panel_sz,
+        panel_offset=panel_offset,
+    )
 
 
 def make_fig3():
     save_path = FIGURE_DIR / "fig3.svg"
-    panel_dir = pathlib.Path(__file__).parents[2] / "figures/vaccination_example"
-    panel_paths = [
-        panel_dir / "susceptibility.svg",
-        panel_dir / "reproduction_number.svg",
-        panel_dir / "outbreak_risk.svg",
-    ]
-    make_figure(save_path, panel_paths)
-
-
-def make_fig4():
-    save_path = FIGURE_DIR / "fig4.svg"
     panel_dir = pathlib.Path(__file__).parents[2] / "figures/optimizing_vaccination"
     panel_paths = [
         panel_dir / "heatmap.svg",
@@ -122,8 +183,8 @@ def make_fig4():
     )
 
 
-def make_fig5():
-    save_path = FIGURE_DIR / "fig5.svg"
+def make_fig4():
+    save_path = FIGURE_DIR / "fig4.svg"
     panel_dir = pathlib.Path(__file__).parents[2] / "figures"
     panel_paths = [
         panel_dir / "sensitivity_k/default.svg",
@@ -142,4 +203,3 @@ if __name__ == "__main__":
     make_fig2()
     make_fig3()
     make_fig4()
-    make_fig5()
