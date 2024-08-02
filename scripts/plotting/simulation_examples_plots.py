@@ -21,15 +21,18 @@ def make_plots():
     # Plot simulations
     simulations_plot = [0, 1, 3, 37, 6, 90, 4, 12, 48, 47]
     x_max = 16
-    fig, axs = plt.subplots(2, 5)
+    fig, axs = plt.subplots(2, 5, sharex=True, sharey=True)
+    fig.supxlabel("Day of outbreak", y=0.27)
+    fig.supylabel("Incidence", x=0.04)
     for ax in axs.flat:
         ax.set_box_aspect(1)
+        ax.xaxis.label.set_fontsize(12)
+        ax.yaxis.label.set_fontsize(12)
+        ax.tick_params(axis="both", which="major", labelsize=12)
         ax.set_xlim(0, x_max)
-        ax.set_xticks(np.arange(0, x_max + 1, 4))
-        ax.set_xticklabels([])
+        ax.set_xticks(np.arange(0, 16, 5))
         ax.set_ylim(0, incidence_cutoff)
         ax.set_yticks(np.arange(0, incidence_cutoff + 1, 2))
-        ax.set_yticklabels([])
     fig.subplots_adjust(top=0.65, bottom=0.35)
     for simulation, ax in zip(simulations_plot, axs.flat):
         x = np.arange(x_max + 1)
@@ -44,14 +47,6 @@ def make_plots():
             color = "tab:blue"
             clip_on = False
         ax.plot(x, y, color=color, linewidth=2, zorder=10, clip_on=clip_on)
-        ax.plot(
-            [0, x_max],
-            [incidence_cutoff, incidence_cutoff],
-            "--",
-            color="black",
-            linewidth=1,
-            clip_on=False,
-        )
     plt.xlim(0, x_max)
     plt.ylim(0, incidence_cutoff)
     plt.savefig(figure_dir / "simulations.svg")
