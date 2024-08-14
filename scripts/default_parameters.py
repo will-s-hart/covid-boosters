@@ -41,7 +41,7 @@ def get_default_parameters():
     proportion_vaccinated = 0.6
     population_size = 10000
 
-    sim_incidence_cutoff = 20
+    sim_incidence_cutoff = 30
     no_simulations = 20000
 
     default_parameters = {
