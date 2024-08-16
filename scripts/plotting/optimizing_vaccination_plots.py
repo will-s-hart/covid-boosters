@@ -25,7 +25,11 @@ def make_plots(
     kwargs_best_vacc=None,
     kwargs_heatmap=None,
 ):
-    kwargs_best_unvacc = {"label": "Without vaccination", **(kwargs_best_unvacc or {})}
+    kwargs_best_unvacc = {
+        "label": "Without vaccination",
+        "style": "--",
+        **(kwargs_best_unvacc or {}),
+    }
     kwargs_best_vacc = {"label": "Optimised vaccination", **(kwargs_best_vacc or {})}
     kwargs_heatmap = {
         "cbar_kws": {"label": "Maximum outbreak risk"},
