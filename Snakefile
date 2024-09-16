@@ -24,7 +24,6 @@ rule figures_svg:
         "figures/model_input/generation_time.svg",
         "figures/simulation_examples/simulations.svg",
         "figures/without_vaccination/outbreak_risk.svg",
-        "figures/paper_figures/templates/fig2_template.svg",
         "figures/within_host_dynamics/antibodies.svg",
         "figures/within_host_dynamics/susceptibility.svg",
         "figures/vaccination_example/susceptibility.svg",
@@ -121,6 +120,7 @@ rule format_antibody_model_param_estimates:
 
 rule without_vaccination:
     input:
+        "results/antibody_model_params.csv",
         "scripts/default_parameters.py",
         "covidboosters/base.py",
     output:
@@ -147,6 +147,7 @@ rule without_vaccination_plots:
 rule model_input_plots:
     input:
         "scripts/plotting/plotting_utils.py",
+        "results/antibody_model_params.csv",
         "scripts/default_parameters.py",
     output:
         "figures/model_input/generation_time.svg",
@@ -157,6 +158,7 @@ rule model_input_plots:
 rule superspreading_plots:
     input:
         "scripts/plotting/plotting_utils.py",
+        "results/antibody_model_params.csv",
         "scripts/default_parameters.py",
     output:
         expand(
@@ -169,6 +171,7 @@ rule superspreading_plots:
 
 rule simulation_examples:
     input:
+        "results/antibody_model_params.csv",
         "scripts/default_parameters.py",
         "covidboosters/base.py",
     output:
@@ -228,6 +231,7 @@ rule vaccination_example_plots:
         "results/vaccination_example.csv",
     output:
         "figures/vaccination_example/susceptibility.svg",
+        "figures/vaccination_example/unvaccinated_reproduction_number.svg",
         "figures/vaccination_example/reproduction_number.svg",
         "figures/vaccination_example/outbreak_risk.svg",
     script:
