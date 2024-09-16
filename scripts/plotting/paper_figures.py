@@ -158,29 +158,6 @@ def make_fig2():
     )
 
 
-def make_fig2_alt():
-    save_path = FIGURE_DIR / "fig2_alt.svg"
-    panel_dir = pathlib.Path(__file__).parents[2] / "figures"
-    panel_paths = [
-        panel_dir / "within_host_dynamics/antibodies.svg",
-        panel_dir / "within_host_dynamics/susceptibility.svg",
-        panel_dir / "vaccination_example/susceptibility.svg",
-        panel_dir / "vaccination_example/unvaccinated_reproduction_number.svg",
-        panel_dir / "vaccination_example/reproduction_number.svg",
-        panel_dir / "vaccination_example/outbreak_risk.svg",
-    ]
-    template_path = FIGURE_DIR / "templates/fig2_alt_template.svg"
-    panel_sz = (360, 340)
-    panel_offset = (-12.5, DEFAULTS["panel_offset"][1])
-    make_figure(
-        save_path,
-        panel_paths,
-        template_path=template_path,
-        panel_sz=panel_sz,
-        panel_offset=panel_offset,
-    )
-
-
 def make_fig3():
     save_path = FIGURE_DIR / "fig3.svg"
     panel_dir = pathlib.Path(__file__).parents[2] / "figures/optimizing_vaccination"
@@ -222,6 +199,5 @@ if __name__ == "__main__":
     FIGURE_DIR.mkdir(exist_ok=True, parents=True)
     make_fig1()
     make_fig2()
-    make_fig2_alt()
     make_fig3()
     make_fig4()
