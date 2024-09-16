@@ -10,7 +10,7 @@ results_dir = pathlib.Path(__file__).parents[1] / "results"
 
 
 def get_default_parameters():
-    period = 360
+    period = 365
     unvacc_rep_no_mean = 2.5  # with below, max is 3
     unvacc_rep_no_prop_var = 0.2
     peak_transmission_time = 0

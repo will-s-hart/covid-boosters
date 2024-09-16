@@ -9,11 +9,15 @@ sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
 
 from scripts.default_parameters import get_default_parameters
 
-# Define conversion between day numbers and dates
-day_0_date = cftime.Datetime360Day(2024, 1, 1)
-
 
 def day_to_date(day):
+    period = get_default_parameters()["period"]
+    if period == 365:
+        day_0_date = cftime.DatetimeNoLeap(2024, 1, 1)
+    elif period == 360:
+        day_0_date = cftime.Datetime360Day(2024, 1, 1)
+    else:
+        raise NotImplementedError("Only periods of 365 or 360 are currently supported.")
     return (day_0_date + timedelta(days=int(day))).strftime("%d %B")
 
 

@@ -72,11 +72,16 @@ def make_plots(
 def make_heatmap_plot(
     df_grid_search,
     vaccination_time_range_best,
-    period=360,
+    period=365,
     **kwargs_heatmap,
 ):
-    if period != 360:
-        raise NotImplementedError("Only period=360 is currently supported.")
+    month_list = ["Jan", "", "", "Apr", "", "", "Jul", "", "", "Oct", "", "", "Jan"]
+    if period == 365:
+        month_starts = np.cumsum([0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
+    elif period == 360:
+        month_starts = np.arange(0, period + 1, period // 12)
+    else:
+        raise NotImplementedError("Only periods of 365 or 360 are currently supported.")
     _, ax, cbar_ax = plotting_utils.setup_figure_with_cbar()
     sns.heatmap(
         df_grid_search.transpose(),
@@ -104,8 +109,6 @@ def make_heatmap_plot(
         ytick_label_inv(duration_best),
         "wo",
     )
-    month_starts = np.arange(0, period + 1, period // 12)
-    month_list = ["Jan", "", "", "Apr", "", "", "Jul", "", "", "Oct", "", "", "Jan"]
     ax.set_xticks(xtick_label_inv(month_starts), labels=month_list, rotation=0)
     ax.set_yticks(ytick_label_inv(month_starts[1:]), labels=month_starts[1:])
     ax.set_xlabel("Start of campaign")

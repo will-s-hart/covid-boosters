@@ -36,10 +36,13 @@ def setup_figure_with_cbar():
     return fig, ax, cbar_ax
 
 
-def months_x_axis(ax, period=360, no_periods=2):
-    if period != 360:
-        raise NotImplementedError("Only period=360 is currently supported.")
-    month_starts = np.arange(0, period, period // 12)
+def months_x_axis(ax, period=365, no_periods=2):
+    if period == 365:
+        month_starts = np.cumsum([0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30])
+    elif period == 360:
+        month_starts = np.arange(0, period, period // 12)
+    else:
+        raise NotImplementedError("Only periods of 365 or 360 are currently supported.")
     month_list = ["Jan", "", "", "Apr", "", "", "Jul", "", "", "Oct", "", ""]
     ax.set_xlim(0, no_periods * period)
     ax.set_xticks(
@@ -52,7 +55,7 @@ def months_x_axis(ax, period=360, no_periods=2):
     ax.set_xlabel(" ")
 
 
-def shade_vaccination_time_range(ax, vaccination_time_range, period=360, no_periods=2):
+def shade_vaccination_time_range(ax, vaccination_time_range, period=365, no_periods=2):
     if vaccination_time_range[1] > period:
         vaccination_time_range[0] -= period
         vaccination_time_range[1] -= period
