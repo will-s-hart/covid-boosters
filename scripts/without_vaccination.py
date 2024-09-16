@@ -14,7 +14,13 @@ def run_analyses():
     default_parameters = get_default_parameters()
     period = default_parameters["period"]
     time_vec = np.arange(2 * period)
-    time_vec_sor = np.arange(2 * period, step=30)
+    if period == 365:
+        month_starts = np.cumsum([0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30])
+        time_vec_sor = np.concatenate((month_starts, month_starts + period))
+    elif period == 360:
+        time_vec_sor = np.arange(2 * period, step=30)
+    else:
+        raise NotImplementedError("Only periods of 365 or 360 are currently supported.")
     kwargs_outbreak_risk_model = {
         "period": period,
         "peak_transmission_time": default_parameters["peak_transmission_time"],
