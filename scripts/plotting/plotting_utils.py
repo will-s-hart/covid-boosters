@@ -29,6 +29,13 @@ def setup_figure():
     return fig, ax
 
 
+def setup_figure_subplots():
+    fig = plt.figure()
+    ax1 = fig.add_axes([0.2, 0.53, 0.6, 0.27])
+    ax2 = fig.add_axes([0.2, 0.2, 0.6, 0.27])
+    return fig, ax1, ax2
+
+
 def setup_figure_with_cbar():
     fig = plt.figure()
     ax = fig.add_axes([0.15, 0.2, 0.6, 0.6])

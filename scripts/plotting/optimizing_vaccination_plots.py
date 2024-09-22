@@ -27,7 +27,7 @@ def make_plots(
 ):
     kwargs_best_unvacc = {
         "label": "Without vaccination",
-        "style": "--",
+        "linestyle": "--",
         **(kwargs_best_unvacc or {}),
     }
     kwargs_best_vacc = {"label": "Optimised vaccination", **(kwargs_best_vacc or {})}
@@ -110,7 +110,9 @@ def make_heatmap_plot(
         "wo",
     )
     ax.set_xticks(xtick_label_inv(month_starts), labels=month_list, rotation=0)
-    ax.set_yticks(ytick_label_inv(month_starts[1:]), labels=month_starts[1:])
+    ax.set_yticks(
+        ytick_label_inv(np.arange(30, 361, 30)), labels=np.arange(30, 361, 30)
+    )
     ax.set_xlabel("Start of campaign")
     ax.set_ylabel("Duration of campaign (days)")
 

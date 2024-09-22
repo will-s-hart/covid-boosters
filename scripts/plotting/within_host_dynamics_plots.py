@@ -24,7 +24,7 @@ def make_plots(plot_ci=True):
     _, ax = plotting_utils.setup_figure()
     df["log10_antibodies_mean"].plot(ax=ax)
     ax.set_xlim(0, period)
-    ax.set_xticks(np.arange(0, period + 1, period / 6))
+    ax.set_xticks(np.arange(0, 361, 60))
     ax.set_ylim(0, 4)
     if plot_ci:
         ax.fill_between(
@@ -41,7 +41,7 @@ def make_plots(plot_ci=True):
     _, ax = plotting_utils.setup_figure()
     df["susceptibility_mean"].plot(ax=ax)
     ax.set_xlim(0, period)
-    ax.set_xticks(np.arange(0, period + 1, period / 6))
+    ax.set_xticks(np.arange(0, 361, 60))
     ax.set_ylim(0, 1)
     if plot_ci:
         ax.fill_between(

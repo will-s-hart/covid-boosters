@@ -20,21 +20,22 @@ def make_plots():
     default_parameters = get_default_parameters()
     period = default_parameters["period"]
     vaccination_time_range = default_parameters["vaccination_time_range"]
-    # Plot reproduction number without vaccination
-    _, ax = plotting_utils.setup_figure()
-    df["r_unvacc"].plot(ax=ax, label="")
-    plotting_utils.months_x_axis(ax, period=period, no_periods=2)
-    ax.set_ylim(0, 3.02)
-    ax.set_ylabel("Instantaneous reproduction number\n(no vaccination)")
-    plt.savefig(figure_dir / "unvaccinated_reproduction_number.svg")
-    # Plot population-average susceptibility
-    _, ax = plotting_utils.setup_figure()
-    df["susceptibility"].plot(ax=ax)
-    plotting_utils.months_x_axis(ax, period=period, no_periods=2)
-    ax.set_ylim(0, 1)
-    plotting_utils.shade_vaccination_time_range(ax, vaccination_time_range)
-    ax.set_ylabel("Average susceptibility")
-    plt.savefig(figure_dir / "susceptibility.svg")
+    # Plot reproduction number without vaccination and population-average susceptibility
+    _, ax1, ax2 = plotting_utils.setup_figure_subplots()
+    df["susceptibility"].plot(ax=ax1)
+    plotting_utils.months_x_axis(ax1, period=period, no_periods=2)
+    ax1.set_xticklabels([])
+    ax1.set_ylim(0.5, 1)
+    ax1.set_yticks([0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    plotting_utils.shade_vaccination_time_range(ax1, vaccination_time_range)
+    ax1.set_ylabel("Average\nsusceptibility")
+    df["r_unvacc"].plot(ax=ax2)
+    plotting_utils.months_x_axis(ax2, period=period, no_periods=2)
+    ax2.set_ylim(1.98, 3.02)
+    ax2.set_yticks([2, 2.2, 2.4, 2.6, 2.8, 3])
+    ax2.set_ylabel("Reproduction number\n(no vaccination)")
+    plotting_utils.shade_vaccination_time_range(ax2, vaccination_time_range)
+    plt.savefig(figure_dir / "susceptibility_reproduction_number.svg")
     # Plot reproduction number with and without vaccination
     _, ax = plotting_utils.setup_figure()
     df["r_unvacc"].plot(ax=ax, style="--", label="Without vaccination")

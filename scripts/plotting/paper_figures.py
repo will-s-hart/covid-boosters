@@ -143,12 +143,10 @@ def make_fig2():
     panel_paths = [
         panel_dir / "within_host_dynamics/antibodies.svg",
         panel_dir / "within_host_dynamics/susceptibility.svg",
-        panel_dir / "vaccination_example/susceptibility.svg",
-        panel_dir / "vaccination_example/unvaccinated_reproduction_number.svg",
-        panel_dir / "vaccination_example/reproduction_number.svg",
+        panel_dir / "vaccination_example/susceptibility_reproduction_number.svg",
         panel_dir / "vaccination_example/outbreak_risk.svg",
     ]
-    panel_sz = (350, 335)
+    panel_sz = (350, 330)
     panel_offset = (-12.5, DEFAULTS["panel_offset"][1])
     make_figure(
         save_path,
