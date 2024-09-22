@@ -1,6 +1,7 @@
 import functools
 import pathlib
 
+import cftime
 import numpy as np
 import pandas as pd
 from scipy import integrate
@@ -37,7 +38,10 @@ def get_default_parameters():
         "half_protection_antibody": 1000,
     }
 
-    vaccination_time_range = [270, 345]
+    vaccination_time_range = [
+        (cftime.DatetimeNoLeap(2024, 10, 1) - cftime.DatetimeNoLeap(2024, 1, 1)).days,
+        (cftime.DatetimeNoLeap(2024, 12, 16) - cftime.DatetimeNoLeap(2024, 1, 1)).days,
+    ]
     proportion_vaccinated = 0.6
     population_size = 10000
 
