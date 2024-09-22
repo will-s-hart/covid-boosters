@@ -11,7 +11,7 @@ rule supp_figures:
     input:
         expand(
             "figures/paper_supp_figures/figS{fig_no}.{extension}",
-            fig_no=range(1, 5),
+            fig_no=range(1, 6),
             extension=["pdf", "png"],
         ),
 
@@ -26,9 +26,7 @@ rule figures_svg:
         "figures/without_vaccination/outbreak_risk.svg",
         "figures/within_host_dynamics/antibodies.svg",
         "figures/within_host_dynamics/susceptibility.svg",
-        "figures/vaccination_example/susceptibility.svg",
-        "figures/vaccination_example/unvaccinated_reproduction_number.svg",
-        "figures/vaccination_example/reproduction_number.svg",
+        "figures/vaccination_example/susceptibility_reproduction_number.svg",
         "figures/vaccination_example/outbreak_risk.svg",
         "figures/optimizing_vaccination/heatmap.svg",
         "figures/optimizing_vaccination/best.svg",
@@ -51,6 +49,7 @@ rule supp_figures_svg:
     input:
         "scripts/plotting/paper_figures.py",
         "figures/superspreading/transmission_proportions.svg",
+        "figures/vaccination_example/reproduction_number.svg",
         "figures/sensitivity_r0_mean/reproduction_number.svg",
         "figures/sensitivity_r0_mean/default.svg",
         "figures/sensitivity_r0_mean/best_0.svg",
@@ -68,6 +67,7 @@ rule supp_figures_svg:
         "figures/paper_supp_figures/figS2.svg",
         "figures/paper_supp_figures/figS3.svg",
         "figures/paper_supp_figures/figS4.svg",
+        "figures/paper_supp_figures/figS5.svg",
     script:
         "scripts/plotting/paper_supp_figures.py"
 
@@ -230,8 +230,7 @@ rule vaccination_example_plots:
         "scripts/plotting/plotting_utils.py",
         "results/vaccination_example.csv",
     output:
-        "figures/vaccination_example/susceptibility.svg",
-        "figures/vaccination_example/unvaccinated_reproduction_number.svg",
+        "figures/vaccination_example/susceptibility_reproduction_number.svg",
         "figures/vaccination_example/reproduction_number.svg",
         "figures/vaccination_example/outbreak_risk.svg",
     script:
