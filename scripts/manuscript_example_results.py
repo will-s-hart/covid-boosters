@@ -21,6 +21,14 @@ def day_to_date(day):
     return (day_0_date + timedelta(days=int(day))).strftime("%d %B")
 
 
+# Get maximum vaccine protection against infection
+df_wh = pd.read_csv(
+    pathlib.Path(__file__).parents[1] / "results/within_host_dynamics.csv",
+    index_col="time",
+)
+max_protection_percent = 100 * (1 - df_wh["susceptibility_mean"].min())
+print(f"Maximum vaccine protection against infection: {max_protection_percent:.0f}%")
+
 # Get COR values with no vaccination, default vaccination, and optimized vaccination
 df_default = pd.read_csv(
     pathlib.Path(__file__).parents[1] / "results/vaccination_example.csv",
@@ -89,4 +97,28 @@ print(
     day_to_date(day_max_default),
     "(date of max COR under default vaccination):",
     f"{df_cor_unvacc[day_max_default]:.2f}",
+)
+
+# Check that dispersion parameter and mean transmissibility do not affect the optimal
+# vaccination time range
+for ext in [
+    "sensitivity_k/vaccination_time_range_best_0.csv",
+    "sensitivity_r0_mean/vaccination_time_range_best_1.csv",
+    "sensitivity_k/vaccination_time_range_best_0.csv",
+    "sensitivity_r0_mean/vaccination_time_range_best_1.csv",
+]:
+    df_vaccination_time_range_best_curr = pd.read_csv(
+        pathlib.Path(__file__).parents[1] / "results" / ext
+    )
+    vaccination_time_range_best_curr = [
+        df_vaccination_time_range_best["start"][0],
+        df_vaccination_time_range_best["end"][0],
+    ]
+    assert vaccination_time_range_best_curr == vaccination_time_range_best, (
+        "Optimal vaccination time range is affected by changes in the dispersion "
+        "parameter or mean transmissibility."
+    )
+print(
+    "Optimal vaccination time range is not affected by changes in the dispersion "
+    "parameter or mean transmissibility."
 )
