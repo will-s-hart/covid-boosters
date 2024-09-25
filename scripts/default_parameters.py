@@ -41,7 +41,7 @@ def get_default_parameters():
     vaccination_time_range = [
         (cftime.DatetimeNoLeap(2024, 10, 1) - cftime.DatetimeNoLeap(2024, 1, 1)).days,
         (cftime.DatetimeNoLeap(2024, 12, 16) - cftime.DatetimeNoLeap(2024, 1, 1)).days,
-    ]
+    ]  # excludes right end point
     proportion_vaccinated = 0.6
     population_size = 10000
 
