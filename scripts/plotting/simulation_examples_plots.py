@@ -19,7 +19,7 @@ def make_plots():
     df_simulations = pd.read_csv(results_dir / "simulations.csv", index_col="time")
     incidence_cutoff = 10
     # Plot simulations
-    simulations_plot = [0, 1, 3, 37, 6, 90, 4, 12, 48, 47]
+    simulations_plot = [0, 1, 2, 3, 21, 15, 10, 11, 4, 5]
     x_max = 16
     fig, axs = plt.subplots(2, 5, sharex=True, sharey=True)
     fig.supxlabel("Day of outbreak", y=0.27)
