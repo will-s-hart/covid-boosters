@@ -96,7 +96,7 @@ def make_plots():
         )
     # Format and save susceptibility plot
     ax_sus.set_xlim(0, period)
-    ax_sus.set_xticks(np.arange(0, period + 1, period / 6))
+    ax_sus.set_xticks(np.arange(0, 361, 60))
     ax_sus.set_ylim(0, 1)
     ax_sus.set_xlabel("Time since vaccination (days)")
     ax_sus.set_ylabel("Relative susceptibility")
