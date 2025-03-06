@@ -38,9 +38,9 @@ df_best = pd.read_csv(
     pathlib.Path(__file__).parents[1] / "results/optimizing_vaccination/best.csv",
     index_col="time",
 )
-df_cor_unvacc = df_default["cor_unvacc"]
-df_cor_default = df_default["cor"]
-df_cor_best = df_best["cor"]
+da_cor_unvacc = df_default["cor_unvacc"]
+da_cor_default = df_default["cor"]
+da_cor_best = df_best["cor"]
 
 # Get default and optimized vaccination time ranges
 vaccination_time_range_default = get_default_parameters()["vaccination_time_range"]
@@ -68,35 +68,47 @@ print(
     day_to_date(vaccination_time_range_best[1] - 1),
 )
 
+# Values of COR on 1st January
+print(f"COR with no vaccination on {day_to_date(0)}: {da_cor_unvacc[0]:.2f}")
+print(f"COR with default vaccination on {day_to_date(0)}: {da_cor_default[0]:.2f}")
+print(
+    f"Percent reduction in COR on {day_to_date(0)} by default vacc: "
+    f"{100 * ((da_cor_unvacc[0] - da_cor_default[0]) / da_cor_unvacc[0]):.0f}%"
+)
+
 # Values and dates of maximum annual COR
-day_max_unvacc = df_cor_unvacc.idxmax()
-day_max_default = df_cor_default.idxmax()
-day_max_best = df_cor_best.idxmax()
+day_max_unvacc = da_cor_unvacc.idxmax()
+day_max_default = da_cor_default.idxmax()
+day_max_best = da_cor_best.idxmax()
 print(
     "Maximum annual COR with no vaccination:",
-    f"{df_cor_unvacc[day_max_unvacc]:.2f}",
+    f"{da_cor_unvacc[day_max_unvacc]:.2f}",
     "on",
     day_to_date(day_max_unvacc),
 )
 print(
     "Maximum annual COR with default vaccination:",
-    f"{df_cor_default[day_max_default]:.2f}",
+    f"{da_cor_default[day_max_default]:.2f}",
     "on",
     day_to_date(day_max_default),
 )
 print(
     "Maximum annual COR with optimized vaccination:",
-    f"{df_cor_best[day_max_best]:.2f}",
+    f"{da_cor_best[day_max_best]:.2f}",
     "on",
     day_to_date(day_max_best),
 )
 
-# Unvaccinated COR on date of maximum annual COR with basline vaccination
+# Unvaccinated COR on date of maximum annual COR with baseline vaccination
 print(
     "COR with no vaccination on",
     day_to_date(day_max_default),
     "(date of max COR under default vaccination):",
-    f"{df_cor_unvacc[day_max_default]:.2f}",
+    f"{da_cor_unvacc[day_max_default]:.2f}",
+)
+print(
+    f"Percent reduction in COR on {day_to_date(day_max_default)} by default vacc: "
+    f"{100 * ((da_cor_unvacc[day_max_default] - da_cor_default[day_max_default]) / da_cor_unvacc[day_max_default]):.0f}%"
 )
 
 # Check that dispersion parameter and mean transmissibility do not affect the optimal
