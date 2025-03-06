@@ -4,18 +4,19 @@ channels:
  - bioconda
  - nodefaults
 dependencies:
- - numpy
- - scipy
- - matplotlib
- - seaborn
- - pandas
- - joblib
- - tqdm
- - cftime
- - svgutils
- - snakemake
+ - python=3.12
+ - numpy=2.2
+ - scipy=1.15
+ - matplotlib=3.10
+ - seaborn=0.13
+ - pandas=2.2
+ - joblib=1.4
+ - tqdm=4.67
+ - cftime=1.6
+ - svgutils=0.3
+ - snakemake=8.29
  #Linting
- - ruff
+ - ruff=0.9
  #Notebooks
- - ipykernel
+ - ipykernel=6.29
 
