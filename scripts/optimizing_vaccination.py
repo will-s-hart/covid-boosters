@@ -62,9 +62,43 @@ def run_analyses(
             "from scratch."
         )
         _ = outbreak_risk_model.susceptibility(np.arange(period))
+    # Determine optimal vaccination timing
+    vaccination_time_range_best = _run_optimization(
+        outbreak_risk_model,
+        obj_func=obj_func,
+        grid_step=grid_step,
+        refine=refine,
+        save_path_grid_search=save_path_grid_search,
+        save_path_vaccination_time_range_best=save_path_vaccination_time_range_best,
+    )
+    # Results with optimal vaccination timing
+    if save_path_best is not None:
+        vaccination_example.run_analyses(
+            save_path=save_path_best,
+            load_path_susceptibility_all_0=load_path_susceptibility_all_0,
+            **{
+                **kwargs_outbreak_risk_model,
+                "vaccination_time_range": vaccination_time_range_best,
+            },
+        )
+
+
+def _run_optimization(
+    outbreak_risk_model,
+    obj_func=np.max,
+    start_time_grid_vals=None,
+    duration_grid_vals=None,
+    grid_step=1,
+    refine=False,
+    save_path_grid_search=None,
+    save_path_vaccination_time_range_best=None,
+):
+    period = outbreak_risk_model._period
     # Grid of vaccination start times and durations
-    start_time_grid_vals = np.arange(0, period + 1, grid_step)
-    duration_grid_vals = np.arange(grid_step, period + 1, grid_step)
+    if start_time_grid_vals is None:
+        start_time_grid_vals = np.arange(0, period + 1, grid_step)
+    if duration_grid_vals is None:
+        duration_grid_vals = np.arange(grid_step, period + 1, grid_step)
     start_time_best, duration_best = _run_grid_search(
         outbreak_risk_model,
         save_path_grid_search=save_path_grid_search,
@@ -96,15 +130,6 @@ def run_analyses(
         start_time_best,
         start_time_best + duration_best,
     ]
-    if save_path_best is not None:
-        vaccination_example.run_analyses(
-            save_path=save_path_best,
-            load_path_susceptibility_all_0=load_path_susceptibility_all_0,
-            **{
-                **kwargs_outbreak_risk_model,
-                "vaccination_time_range": vaccination_time_range_best,
-            },
-        )
     if save_path_vaccination_time_range_best is not None:
         pd.DataFrame(
             {
@@ -112,6 +137,7 @@ def run_analyses(
                 "end": [vaccination_time_range_best[1]],
             }
         ).to_csv(save_path_vaccination_time_range_best)
+    return vaccination_time_range_best
 
 
 def _run_grid_search(
@@ -121,7 +147,6 @@ def _run_grid_search(
     start_time_grid_vals=None,
     duration_grid_vals=None,
 ):
-    # Define objective function
     period = outbreak_risk_model._period
 
     def worker(vaccination_start_time, vaccination_duration):
