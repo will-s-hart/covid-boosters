@@ -7,20 +7,20 @@ data_dir = Path(__file__).parents[1] / "data"
 results_dir = Path(__file__).parents[1] / "results"
 results_dir.mkdir(exist_ok=True, parents=True)
 
-df_hcw = pd.read_csv(data_dir / "12HCWs_NLMEM_parameters.csv", index_col=0)
+df_hcw = pd.read_csv(data_dir / "12_HCWs_parameters.csv", index_col=0)
 df_cohort = pd.read_csv(
-    data_dir / "1618_FukushimaVaccineCohorts_NLSM_parameters.csv", index_col=0
+    data_dir / "1618_FukushimaVaccineCohort_parameters.csv", index_col=0
 )
 
 df_params_individual = pd.DataFrame(
     {
-        "mrna_dose": 100,
-        "mrna_decay_rate": np.log(2),
-        "delay_to_antibody_response": df_hcw["eta_3"]["Fix effects"],
-        "max_antibody_production_rate": df_cohort["M_b"],
-        "mrna_response_steepness": df_cohort["m_b"],
-        "half_maximal_response_mrna": df_hcw["K"]["Fix effects"],
-        "antibody_decay_rate": df_hcw["mu"]["Fix effects"],
+        "mrna_dose": df_hcw["D"]["Fixed effect"],
+        "mrna_decay_rate": df_hcw["delta"]["Fixed effect"],
+        "delay_to_antibody_response": df_hcw["tau_d"]["Fixed effect"],
+        "max_antibody_production_rate": df_cohort["H"],
+        "mrna_response_steepness": df_cohort["m"],
+        "half_maximal_response_mrna": df_hcw["K"]["Fixed effect"],
+        "antibody_decay_rate": df_hcw["mu"]["Fixed effect"],
     }
 )
 
