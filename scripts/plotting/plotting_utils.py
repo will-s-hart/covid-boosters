@@ -88,7 +88,7 @@ def make_figure(
     # append plots and labels to figure
     fig.append(panels + labels)
     # save generated SVG files
-    save_path.mkdir(exist_ok=True, parents=True)
+    save_path.parent.mkdir(exist_ok=True, parents=True)
     fig.save(save_path)
 
 
