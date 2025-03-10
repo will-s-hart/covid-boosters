@@ -2,6 +2,92 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
+DEFAULTS = {
+    "panel_sz": (340, 320),
+    "panel_offset": (-25, -60),
+    "label_offset": (5, 20),
+    "label_size": 20,
+}
+
+
+def make_figure(
+    save_path,
+    panel_paths,
+    template_path=None,
+    sz=None,
+    tiling=None,
+    panel_sz=None,
+    panel_offset=None,
+    panel_positions=None,
+    panel_scalings=None,
+    label_strings=None,
+    label_size=None,
+    label_offset=None,
+    label_positions=None,
+):
+    no_panels = len(panel_paths)
+    if tiling is None:
+        rows = 1 + (no_panels - 1) // 3
+        cols = ceil(no_panels // rows)
+    else:
+        cols, rows = tiling
+    if panel_sz is None:
+        panel_sz = DEFAULTS["panel_sz"]
+    if sz is None:
+        sz = (panel_sz[0] * cols, panel_sz[1] * rows)
+    if panel_offset is None:
+        panel_offset = DEFAULTS["panel_offset"]
+    if panel_positions is None:
+        panel_positions = [
+            (
+                panel_offset[0] + panel_sz[0] * (i % cols),
+                panel_offset[1] + panel_sz[1] * (i // cols),
+            )
+            for i in range(no_panels)
+        ]
+    if panel_scalings is None:
+        panel_scalings = [1] * no_panels
+    if label_strings is None:
+        label_strings = [chr(65 + i) + "." for i in range(no_panels)]
+    if label_size is None:
+        label_size = DEFAULTS["label_size"]
+    if label_offset is None:
+        label_offset = DEFAULTS["label_offset"]
+    if label_positions is None:
+        label_positions = [
+            (
+                label_offset[0] + panel_sz[0] * (i % cols),
+                label_offset[1] + panel_sz[1] * (i // cols),
+            )
+            for i in range(no_panels)
+        ]
+    # create new SVG figure
+    if template_path is not None:
+        fig = svgt.fromfile(template_path)
+    else:
+        fig = svgt.SVGFigure()
+        fig.set_size((str(sz[0]) + "px", str(sz[1]) + "px"))
+    # load matpotlib-generated figures
+    panels = []
+    for path in panel_paths:
+        if path is not None:
+            panel = svgt.fromfile(path).getroot()
+        else:
+            panel = svgt.TextElement(0, 0, "")
+        panels.append(panel)
+    for panel, position, scaling in zip(panels, panel_positions, panel_scalings):
+        panel.moveto(position[0], position[1], scale_x=scaling)
+    # add text labels
+    labels = [
+        svgt.TextElement(position[0], position[1], string, size=label_size)
+        for string, position in zip(label_strings, label_positions)
+    ]
+    # append plots and labels to figure
+    fig.append(panels + labels)
+    # save generated SVG files
+    save_path.mkdir(exist_ok=True, parents=True)
+    fig.save(save_path)
+
 
 def set_sns_theme():
     rc_params = {

@@ -1,109 +1,183 @@
 rule figures:
     input:
-        expand(
-            "figures/paper_figures/fig{fig_no}.{extension}",
-            fig_no=range(1, 5),
-            extension=["pdf", "png"],
-        ),
+        "figures/paper_figures/figure_1.svg",
+        "figures/paper_figures/figure_2.svg",
+        "figures/paper_figures/figure_3.svg",
+        "figures/paper_figures/figure_4.svg",
 
 
 rule supp_figures:
     input:
+        "figures/paper_supp_figures/supp_figure_1.svg",
+        "figures/paper_supp_figures/supp_figure_2.svg",
+        "figures/paper_supp_figures/supp_figure_3.svg",
+        "figures/paper_supp_figures/supp_figure_4.svg",
+        "figures/paper_supp_figures/supp_figure_5.svg",
+
+
+rule figures_pdf_png:
+    input:
         expand(
-            "figures/paper_supp_figures/figS{fig_no}.{extension}",
-            fig_no=range(1, 6),
+            "figures/paper_figures/figure_{figure_number}.{extension}",
+            figure_number=range(1, 5),
             extension=["pdf", "png"],
         ),
 
 
-rule figures_svg:
+rule supp_figures_pdf_png:
     input:
-        "figures/paper_figures/templates/fig1_template.svg",
+        expand(
+            "figures/paper_supp_figures/supp_figure_{figure_number}.{extension}",
+            figure_number=range(1, 6),
+            extension=["pdf", "png"],
+        ),
+
+
+rule figure_1:
+    input:
+        "figures/paper_figures/templates/figure_1_template.svg",
         "figures/without_vaccination/reproduction_number.svg",
         "figures/superspreading/infectiousness_factors.svg",
         "figures/model_input/generation_time.svg",
         "figures/simulation_examples/simulations.svg",
         "figures/without_vaccination/outbreak_risk.svg",
+        "scripts/plotting/plotting_utils.py",
+    output:
+        "figures/paper_figures/figure_1.svg",
+    script:
+        "scripts/plotting/figure_1.py"
+
+
+rule figure_2:
+    input:
         "figures/within_host_dynamics/antibodies.svg",
         "figures/within_host_dynamics/susceptibility.svg",
         "figures/vaccination_example/susceptibility_reproduction_number.svg",
         "figures/vaccination_example/outbreak_risk.svg",
+        "scripts/plotting/plotting_utils.py",
+    output:
+        "figures/paper_figures/figure_2.svg",
+    script:
+        "scripts/plotting/figure_2.py"
+
+
+rule figure_3:
+    input:
         "figures/optimizing_vaccination/heatmap.svg",
         "figures/optimizing_vaccination/best.svg",
+        "scripts/plotting/plotting_utils.py",
+    output:
+        "figures/paper_figures/figure_3.svg",
+    script:
+        "scripts/plotting/figure_3.py"
+
+
+rule figure_4:
+    input:
         "figures/sensitivity_k/default.svg",
         "figures/sensitivity_k/best_0.svg",
         "figures/sensitivity_k/best_1.svg",
         "figures/sensitivity_prop_vacc/default.svg",
         "figures/sensitivity_prop_vacc/best_0.svg",
         "figures/sensitivity_prop_vacc/best_1.svg",
+        "scripts/plotting/plotting_utils.py",
     output:
-        "figures/paper_figures/fig1.svg",
-        "figures/paper_figures/fig2.svg",
-        "figures/paper_figures/fig3.svg",
-        "figures/paper_figures/fig4.svg",
+        "figures/paper_figures/figure_4.svg",
     script:
-        "scripts/plotting/paper_figures.py"
+        "scripts/plotting/figure_4.py"
 
 
-rule supp_figures_svg:
+rule supp_figure_1:
     input:
-        "scripts/plotting/paper_figures.py",
         "figures/superspreading/transmission_proportions.svg",
+        "scripts/plotting/plotting_utils.py",
+    output:
+        "figures/paper_supp_figures/supp_figure_1.svg",
+    script:
+        "scripts/plotting/supp_figure_1.py"
+
+
+rule supp_figure_2:
+    input:
         "figures/vaccination_example/reproduction_number.svg",
+        "scripts/plotting/plotting_utils.py",
+    output:
+        "figures/paper_supp_figures/supp_figure_2.svg",
+    script:
+        "scripts/plotting/supp_figure_2.py"
+
+
+rule supp_figure_3:
+    input:
         "figures/sensitivity_r0_mean/reproduction_number.svg",
         "figures/sensitivity_r0_mean/default.svg",
         "figures/sensitivity_r0_mean/best_0.svg",
         "figures/sensitivity_r0_mean/best_1.svg",
+        "scripts/plotting/plotting_utils.py",
+    output:
+        "figures/paper_supp_figures/supp_figure_3.svg",
+    script:
+        "scripts/plotting/supp_figure_3.py"
+
+
+rule supp_figure_4:
+    input:
         "figures/sensitivity_r0_var/reproduction_number.svg",
         "figures/sensitivity_r0_var/default.svg",
         "figures/sensitivity_r0_var/best_0.svg",
         "figures/sensitivity_r0_var/best_1.svg",
+        "scripts/plotting/plotting_utils.py",
+    output:
+        "figures/paper_supp_figures/supp_figure_4.svg",
+    script:
+        "scripts/plotting/supp_figure_4.py"
+
+
+rule supp_figure_5:
+    input:
         "figures/sensitivity_vacc_effect/susceptibility.svg",
         "figures/sensitivity_vacc_effect/default.svg",
         "figures/sensitivity_vacc_effect/best_0.svg",
         "figures/sensitivity_vacc_effect/best_1.svg",
+        "scripts/plotting/plotting_utils.py",
     output:
-        "figures/paper_supp_figures/figS1.svg",
-        "figures/paper_supp_figures/figS2.svg",
-        "figures/paper_supp_figures/figS3.svg",
-        "figures/paper_supp_figures/figS4.svg",
-        "figures/paper_supp_figures/figS5.svg",
+        "figures/paper_supp_figures/supp_figure_5.svg",
     script:
-        "scripts/plotting/paper_supp_figures.py"
+        "scripts/plotting/supp_figure_5.py"
 
 
 rule fig_svg_to_pdf:
     input:
-        "figures/paper_figures/fig{fig_no}.svg",
+        "figures/paper_figures/figure_{figure_number}.svg",
     output:
-        "figures/paper_figures/fig{fig_no}.pdf",
+        "figures/paper_figures/figure_{figure_number}.pdf",
     shell:
         "inkscape --export-type=pdf --export-filename={output} {input}"
 
 
 rule fig_svg_to_png:
     input:
-        "figures/paper_figures/fig{fig_no}.svg",
+        "figures/paper_figures/figure_{figure_number}.svg",
     output:
-        "figures/paper_figures/fig{fig_no}.png",
+        "figures/paper_figures/figure_{figure_number}.png",
     shell:
         "inkscape --export-type=png --export-filename={output} {input}"
 
 
 rule supp_fig_svg_to_pdf:
     input:
-        "figures/paper_supp_figures/fig{fig_no}.svg",
+        "figures/paper_supp_figures/supp_figure_{figure_number}.svg",
     output:
-        "figures/paper_supp_figures/fig{fig_no}.pdf",
+        "figures/paper_supp_figures/supp_figure_{figure_number}.pdf",
     shell:
         "inkscape --export-type=pdf --export-filename={output} {input}"
 
 
 rule supp_fig_svg_to_png:
     input:
-        "figures/paper_supp_figures/fig{fig_no}.svg",
+        "figures/paper_supp_figures/supp_figure_{figure_number}.svg",
     output:
-        "figures/paper_supp_figures/fig{fig_no}.png",
+        "figures/paper_supp_figures/supp_figure_{figure_number}.png",
     shell:
         "inkscape --export-type=png --export-filename={output} {input}"
 
