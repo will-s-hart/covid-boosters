@@ -16,7 +16,8 @@ panel_paths = [
     panel_dir / "without_vaccination/outbreak_risk.svg",
 ]
 template_path = (
-    pathlib.Path(__file__).parents[2] / "figures/templates/fig1_template.svg"
+    pathlib.Path(__file__).parents[2]
+    / "figures/paper_figures/templates/figure_1_template.svg"
 )
 panel_sz = (340, 364)
 panel_offset = (-15, -45)
