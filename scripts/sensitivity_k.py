@@ -1,8 +1,6 @@
 import pathlib
 import sys
 
-import numpy as np
-
 sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
 
 from scripts import optimizing_vaccination, vaccination_example
