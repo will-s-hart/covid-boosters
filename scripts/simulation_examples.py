@@ -1,3 +1,11 @@
+"""
+Script to run example model simulations in illustrative analysis without vaccination.
+
+A sinusoidally varying reproduction number is assumed, with no vaccination.
+A data frame containing the incidence time series of multiple simulations is created
+and saved in the `results/simulation_examples` directory.
+"""
+
 import pathlib
 import sys
 
@@ -11,6 +19,7 @@ from scripts.default_parameters import get_default_parameters
 
 
 def run_analyses():
+    """Run the analyses."""
     default_parameters = get_default_parameters()
     period = default_parameters["period"]
     time_vec = np.arange(period)

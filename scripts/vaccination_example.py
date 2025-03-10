@@ -1,3 +1,17 @@
+"""
+Script for the default analysis of the COVID-19 outbreak risk with annual vaccination.
+
+A sinusoidally varying reproduction number in the absence of vaccination is combined
+with a susceptibility profile calculated from the antibody dynamics model. Population
+susceptibility, reproduction and outbreak risk values are calculated and saved in the
+`results` directory.
+
+The `within_host_dynamics.py` script should be run first to run the within-host model
+and generate the population susceptibility values when all individuals are vaccinated at
+time 0 (which is used to calculate susceptibility values under the vaccination scenario
+in this script).
+"""
+
 import pathlib
 import sys
 
@@ -16,6 +30,27 @@ def run_analyses(
     load_path_susceptibility_all_0=None,
     **kwargs_outbreak_risk_model,
 ):
+    """
+    Run the analyses.
+
+    Parameters
+    ----------
+    save_path : str, optional
+        Path to save the results.
+    save_path_susceptibility_all_0 : str, optional
+        Path to save the population susceptibility values when all individuals are
+        vaccinated at time 0 (to re-use in other scripts).
+    load_path_susceptibility_all_0 : str, optional
+        Path from which to load the population susceptibility values when all
+        individuals are vaccinated at time 0, if they have been saved previously.
+    kwargs_outbreak_risk_model : dict
+        Additional keyword arguments for the `covidboosters.OutbreakRiskModel` class.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Data frame containing the results.
+    """
     default_parameters = get_default_parameters()
     kwargs_outbreak_risk_model_in = kwargs_outbreak_risk_model
     kwargs_outbreak_risk_model = {

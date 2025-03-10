@@ -1,3 +1,19 @@
+"""
+Script to make plots for analysis of optimised annual vaccine distribution timing.
+
+A heatmap of the annual peak outbreak risk for different vaccination start times and
+durations is generated, as well as a plot of the outbreak risk over time without
+vaccination and with the optimised vaccination strategy. The plots are saved in the
+`figures/optimizing_vaccination` directory.
+
+The `optimizing_vaccination.py` script must be run before this script to generate the
+underlying results.
+
+A range of optional keyword arguments are included in the main make_plots function
+(these are used by other scripts for sensitivity analyses which call the make_plots
+function from this script).
+"""
+
 import pathlib
 import sys
 
@@ -25,6 +41,42 @@ def make_plots(
     kwargs_best_vacc=None,
     kwargs_heatmap=None,
 ):
+    """
+    Make plots for the optimised annual vaccine distribution timing analysis.
+
+    Parameters
+    ----------
+    load_path : str or pathlib.Path
+        Path to the CSV file containing the grid search results.
+    load_path_best : str or pathlib.Path
+        Path to the CSV file containing the outbreak risk values under the optimal
+        vaccine distribution timing.
+    load_path_vaccination_time_range_best : str or pathlib.Path
+        Path to the CSV file containing the optimal vaccination time range.
+    figure_path_heatmap : str or pathlib.Path
+        Path to save the heatmap plot of the annual peak outbreak risk at each grid
+        search point.
+    figure_path_best : str or pathlib.Path
+        Path to save the plot of the outbreak risk over time without vaccination and
+        with the optimal vaccination strategy.
+    show_plots : bool, optional
+        Whether to show the plots, by default True.
+    ylim_best : tuple, optional
+        Y-axis limits for the optimised outbreak risk plot, by default (0, 0.5).
+    kwargs_best_unvacc : dict, optional
+        Keyword arguments for plotting the outbreak risk without vaccination, by default
+        None.
+    kwargs_best_vacc : dict, optional
+        Keyword arguments for plotting the outbreak risk with the optimal vaccination
+        strategy, by default None.
+    kwargs_heatmap : dict, optional
+        Keyword arguments for plotting the heatmap of the annual peak outbreak risk, by
+        default None.
+
+    Returns
+    -------
+    None
+    """
     kwargs_best_unvacc = {
         "label": "Without vaccination",
         "linestyle": "--",
@@ -75,6 +127,28 @@ def make_heatmap_plot(
     period=365,
     **kwargs_heatmap,
 ):
+    """
+    Make a heatmap of the annual peak outbreak risk values from the grid search.
+
+    The optimal vaccination start time and duration are indicated on the heatmap.
+
+    Parameters
+    ----------
+    df_grid_search : pandas.DataFrame
+        DataFrame containing the annual peak outbreak risk values for different
+        vaccination start times and durations.
+    vaccination_time_range_best : list
+        List containing the optimal vaccination start time and duration.
+    period : int, optional
+        Period of the outbreak risk model, by default 365.
+    **kwargs_heatmap
+        Additional keyword arguments for the seaborn heatmap function used to generate
+        the plot.
+
+    Returns
+    -------
+    None
+    """
     month_list = ["Jan", "", "", "Apr", "", "", "Jul", "", "", "Oct", "", "", "Jan"]
     if period == 365:
         month_starts = np.cumsum([0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])

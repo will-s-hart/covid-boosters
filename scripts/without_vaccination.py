@@ -1,3 +1,12 @@
+"""
+Script to run simple illustrative analysis of outbreak risk with periodic transmission.
+
+A sinusoidally varying reproduction number is assumed, with no vaccination. Outbreak
+risk values are calculated analytically and via simulation for different values of the
+dispersion parameter of the negative binomial offspring distribution. The results are
+saved in the `results/without_vaccination` directory.
+"""
+
 import pathlib
 import sys
 
@@ -11,6 +20,7 @@ from scripts.default_parameters import get_default_parameters
 
 
 def run_analyses():
+    """Run the analyses."""
     default_parameters = get_default_parameters()
     period = default_parameters["period"]
     time_vec = np.arange(2 * period)

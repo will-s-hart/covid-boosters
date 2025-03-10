@@ -1,3 +1,14 @@
+"""
+Script for exploring sensitivity to vaccine effectiveness.
+
+The script calculates the optimal vaccination timing to minimise the peak annual
+outbreak risk for different values of the antibody level at which individuals are
+half as susceptible as unvaccinated individuals. The within-host dynamics
+(containing different susceptibility values to those in the default analysis), grid
+search output, optimal vaccination timing and outbreak risk values under the optimal
+vaccination timing are saved in the `results/sensitivity_vacc_effect` directory.
+"""
+
 import pathlib
 import sys
 
@@ -10,6 +21,16 @@ half_protection_antibody_vals = [500, 2000]
 
 
 def run_analyses(half_protection_antibody_index):
+    """
+    Run the analyses.
+
+    Parameters
+    ----------
+    half_protection_antibody_index : int
+        Index of the antibody level at which individuals are half as susceptible as
+        unvaccinated individuals in the `half_protection_antibody_vals` list (as defined
+        within this script).
+    """
     results_dir = pathlib.Path(__file__).parents[1] / "results/sensitivity_vacc_effect"
     results_dir.mkdir(exist_ok=True, parents=True)
     save_path_within_host = (

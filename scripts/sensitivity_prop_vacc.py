@@ -1,3 +1,18 @@
+"""
+Script for exploring sensitivity to the proportion of the population vaccinated.
+
+The script calculates the optimal vaccination timing to minimise the peak annual
+outbreak risk for different values of the proportion of the population vaccinated each
+year. The grid search output, optimal vaccination timing and outbreak risk values under
+the optimal vaccination timing are saved in the `results/sensitivity_prop_vacc`
+directory.
+
+The `vaccination_example.py` script should be run first to run the within-host model
+and generate the population susceptibility values when all individuals are vaccinated at
+time 0 (which is used to calculate susceptibility values under different vaccination
+scenarios in this script).
+"""
+
 import pathlib
 import sys
 
@@ -9,6 +24,15 @@ prop_vacc_vals = [0.4, 0.8]
 
 
 def run_analyses(prop_vacc_index):
+    """
+    Run the analyses.
+
+    Parameters
+    ----------
+    prop_vacc_index : int
+        Index of the proportion of the population vaccinated each year in the
+        `prop_vacc_vals` list (as defined within this script).
+    """
     results_dir = pathlib.Path(__file__).parents[1] / "results/sensitivity_prop_vacc"
     results_dir.mkdir(exist_ok=True, parents=True)
     save_path_default = results_dir / f"default_{prop_vacc_index}.csv"

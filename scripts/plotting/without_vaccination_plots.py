@@ -1,3 +1,15 @@
+"""
+Script for plotting illustrative analysis of outbreak risk with periodic transmission.
+
+Plots of the reproduction number over time are generated, as well as outbreak risk
+values calculated both analytically and via simulation for different values of the
+dispersion parameter of the negative binomial offspring distribution. The plots are
+saved in the `figures/without_vaccination` directory.
+
+The `without_vaccination.py` script must be run before this script to generate the
+underlying results.
+"""
+
 import pathlib
 import sys
 
@@ -12,6 +24,7 @@ from scripts.plotting import plotting_utils
 
 
 def make_plots():
+    """Make and save the plots."""
     plotting_utils.set_sns_theme()
     results_dir = pathlib.Path(__file__).parents[2] / "results/without_vaccination"
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/without_vaccination"

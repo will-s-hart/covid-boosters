@@ -1,3 +1,16 @@
+"""
+Script for plots of sensitivity analysis of the proportion of vaccinated individuals.
+
+Plots of the outbreak risk without vaccination and under the default vaccination
+strategy are generated for different values of the proportion of vaccinated individuals
+on the same axes, as well as separate plots for each value of the proportion of
+vaccinated individuals showing optimal vaccination strategies. The plots are saved in
+the `figures/sensitivity_prop_vacc` directory.
+
+The `sensitivity_prop_vacc.py` script must be run before this script to generate the
+underlying results.
+"""
+
 import pathlib
 import sys
 
@@ -13,6 +26,7 @@ from scripts.plotting import optimizing_vaccination_plots, plotting_utils
 
 
 def make_plots():
+    """Make and save the plots."""
     plotting_utils.set_sns_theme()
     color_palette = sns.color_palette("colorblind")
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/sensitivity_prop_vacc"

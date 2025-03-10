@@ -1,3 +1,9 @@
+"""
+Script to combine the panels of Figure 1 and save the figure in SVG format.
+
+The panels are placed within a template SVG file (created in Inkscape).
+"""
+
 import pathlib
 import sys
 

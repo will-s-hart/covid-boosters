@@ -1,3 +1,12 @@
+"""
+Script for running the within-host model in the main COVID-19 case study.
+
+Antibody titers and susceptibility values are calculated relative to the most recent
+vaccine dose for a cohort of individuals. Summary statistics are calculated and saved in
+the `results` directory. The population susceptibility values when all individuals are
+vaccinated at time 0 are also saved for re-use in other scripts.
+"""
+
 import pathlib
 import sys
 
@@ -15,6 +24,24 @@ def run_analyses(
     save_path_susceptibility_all_0=None,
     **kwargs_individual_susceptibility_model_in,
 ):
+    """
+    Run the analyses.
+
+    Parameters
+    ----------
+    save_path : str
+        Path to save the results.
+    save_path_susceptibility_all_0 : str, optional
+        Path to save the population susceptibility values when all individuals are
+        vaccinated at time 0 (to re-use in other scripts).
+    kwargs_individual_susceptibility_model_in : dict
+        Additional keyword arguments for the
+        `covidboosters.PeriodicIndividualSusceptibilityModel` class.
+
+    Returns
+    -------
+    None
+    """
     default_parameters = get_default_parameters()
     period = default_parameters["period"]
     population_size = default_parameters["population_size"]

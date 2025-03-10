@@ -1,3 +1,22 @@
+"""
+Script for analysis of the optimal timing of annual COVID-19 vaccine distribution.
+
+The script calculates the optimal vaccination timing to minimise the peak annual
+outbreak risk via grid search. The grid search output, optimal vaccination timing and
+outbreak risk values under the optimal vaccination timing are saved in the
+`results/optimizing_vaccination` directory.
+
+The `within_host_dynamics.py` script should be run first to run the within-host model
+and generate the population susceptibility values when all individuals are vaccinated at
+time 0 (which is used to calculate susceptibility values under different vaccination
+scenarios in this script).
+
+A refinement option in the grid search is available for efficiency (this isn't used
+in this script as the entire grid is searched for illustrative purposes, but is used
+by other scripts for sensitivity analyses which call the `run_analyses` function from
+this script).
+"""
+
 import copy
 import itertools
 import pathlib
@@ -25,6 +44,34 @@ def run_analyses(
     refine=True,
     **kwargs_outbreak_risk_model,
 ):
+    """
+    Run the analyses.
+
+    Parameters
+    ----------
+    save_path_grid_search : str, optional
+        Path to save the objective function value at each grid point.
+    save_path_best : str, optional
+        Path to save the results with the optimal vaccination timing.
+    save_path_vaccination_time_range_best : str, optional
+        Path to save the optimal vaccination timing.
+    load_path_susceptibility_all_0 : str, optional
+        Path from which to load the population susceptibility values when all
+        individuals are vaccinated at time 0, if they have been saved previously.
+    obj_func : function, optional
+        Objective function to minimize in the grid search. Default is `np.max` (i.e.,
+        the peak annual outbreak risk is minimized).
+    grid_step : int, optional
+        Grid step size for the grid search. Default is 10.
+    refine : bool, optional
+        Whether to refine the search around the optimal grid point. Default is True.
+    kwargs_outbreak_risk_model : dict
+        Additional keyword arguments for the `covidboosters.OutbreakRiskModel` class.
+
+    Returns
+    -------
+    None
+    """
     default_parameters = get_default_parameters()
     kwargs_outbreak_risk_model_in = kwargs_outbreak_risk_model
     kwargs_outbreak_risk_model = {
@@ -93,6 +140,8 @@ def _run_optimization(
     save_path_grid_search=None,
     save_path_vaccination_time_range_best=None,
 ):
+    # Helper function to run the actual optimization (grid search followed by optional
+    # refinement step)
     period = outbreak_risk_model._period
     # Grid of vaccination start times and durations
     if start_time_grid_vals is None:
@@ -147,6 +196,7 @@ def _run_grid_search(
     start_time_grid_vals=None,
     duration_grid_vals=None,
 ):
+    # Helper function to run the grid search
     period = outbreak_risk_model._period
 
     def worker(vaccination_start_time, vaccination_duration):

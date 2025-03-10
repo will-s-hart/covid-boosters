@@ -1,3 +1,17 @@
+"""
+Script for plots of sensitivity analysis of mean reproduction number before vaccination.
+
+Plots of the reproduction number over time without vaccination for different values of
+the annual mean reproduction number are generated (on the same axes), as well as
+plots of the outbreak risk without vaccination and under the default vaccination
+strategy for each value of the mean reproduction number. Separate plots are also
+generated for each value of the mean reproduction number showing optimal vaccination
+strategies. The plots are saved in the `figures/sensitivity_r0_mean` directory.
+
+The `sensitivity_r0_mean.py` script must be run before this script to generate the
+underlying results.
+"""
+
 import pathlib
 import sys
 
@@ -14,6 +28,7 @@ from scripts.plotting import optimizing_vaccination_plots, plotting_utils
 
 
 def make_plots():
+    """Make and save the plots."""
     plotting_utils.set_sns_theme()
     color_palette = sns.color_palette("colorblind")
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/sensitivity_r0_mean"

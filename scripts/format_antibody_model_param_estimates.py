@@ -1,3 +1,11 @@
+"""
+Script to format antibody model parameter estimates.
+
+Obtains population and random effects parameter values based on individual parameter
+estimates by Park et al. (2025) in the data directory. Saves the formatted parameter
+estimates to the results directory.
+"""
+
 from pathlib import Path
 
 import numpy as np

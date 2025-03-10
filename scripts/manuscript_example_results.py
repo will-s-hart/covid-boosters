@@ -1,3 +1,5 @@
+"""Script to print example results for the manuscript."""
+
 import pathlib
 import sys
 from datetime import timedelta
@@ -11,6 +13,7 @@ from scripts.default_parameters import get_default_parameters
 
 
 def day_to_date(day):
+    """Convert day of year (starting from 0) to date."""
     period = get_default_parameters()["period"]
     if period == 365:
         day_0_date = cftime.DatetimeNoLeap(2024, 1, 1)

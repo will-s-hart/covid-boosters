@@ -1,3 +1,15 @@
+"""
+Script to make plots of the default analysis of annual COVID-19 vaccination.
+
+Plots of the reproduction number before vaccination and population susceptibility under
+vaccination are generated (combined as two subplots of one figure), as well as plots of
+the reproduction number with/without vaccination, and of the outbreak risk with and
+without vaccination. The plots are saved in the `figures/vaccination_example` directory.
+
+The `vaccination_example.py` script must be run before this script to generate the
+underlying results.
+"""
+
 import pathlib
 import sys
 
@@ -11,6 +23,7 @@ from scripts.plotting import plotting_utils
 
 
 def make_plots():
+    """Make and save the plots."""
     plotting_utils.set_sns_theme()
     results_dir = pathlib.Path(__file__).parents[2] / "results"
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/vaccination_example"

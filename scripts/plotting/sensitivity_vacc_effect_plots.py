@@ -1,3 +1,18 @@
+"""
+Script for plots of sensitivity analysis of vaccine effectiveness.
+
+Plots of population average susceptibility following vaccination for different values of
+the antibody level at which individuals are half as susceptible as unvaccinated
+individuals are generated (on the same axes), as well as plots of the outbreak risk
+without vaccination and under the default vaccination strategy for each value of the
+half-protection antibody level. Separate plots are also generated for each value of the
+half-protection antibody level showing optimal vaccination
+strategies. The plots are saved in the `figures/sensitivity_vacc_effect` directory.
+
+The `sensitivity_vacc_effect.py` script must be run before this script to generate the
+underlying results.
+"""
+
 import pathlib
 import sys
 
@@ -14,6 +29,7 @@ from scripts.plotting import optimizing_vaccination_plots, plotting_utils
 
 
 def make_plots():
+    """Make and save the plots."""
     plotting_utils.set_sns_theme()
     color_palette = sns.color_palette("colorblind")
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/sensitivity_vacc_effect"

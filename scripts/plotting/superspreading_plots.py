@@ -1,3 +1,12 @@
+"""
+Script to generate plots of effect of the dispersion parameter on superspreading.
+
+Plots of the individual reproduction number distribution and the contribution to
+transmission vs proportion of cases are generated for different values of the
+dispersion parameter of the negative binomial offspring distribution, k. The plots are
+saved in the `figures/superspreading` directory.
+"""
+
 import pathlib
 import sys
 
@@ -13,6 +22,7 @@ from scripts.plotting import plotting_utils
 
 
 def make_plots():
+    """Make and save the plots."""
     plotting_utils.set_sns_theme()
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/superspreading"
     figure_dir.mkdir(exist_ok=True, parents=True)

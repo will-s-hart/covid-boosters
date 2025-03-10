@@ -1,3 +1,14 @@
+"""
+Script to generate plots of within-host dynamics following vaccination.
+
+Plots of log10 antibody titres and relative susceptibility over time following
+vaccination are generated, with population average values and 95% prediction interval
+endpoints shown. The plots are saved in the `figures/within_host_dynamics` directory.
+
+The `within_host_dynamics.py` script must be run before this script to generate the
+underlying results.
+"""
+
 import pathlib
 import sys
 
@@ -12,6 +23,19 @@ from scripts.plotting import plotting_utils
 
 
 def make_plots(plot_ci=True):
+    """
+    Make and save the plots.
+
+    Parameters
+    ----------
+    plot_ci : bool, optional
+        Whether to plot the 95% prediction interval around the mean values. Default is
+        True.
+
+    Returns
+    -------
+    None
+    """
     plotting_utils.set_sns_theme()
     results_dir = pathlib.Path(__file__).parents[2] / "results"
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/within_host_dynamics"

@@ -1,3 +1,15 @@
+"""
+Script for making plots for sensitivity analysis of the dispersion parameter k.
+
+Plots of the outbreak risk without vaccination and under the default vaccination
+strategy are generated for different values of k on the same axes, as well as separate
+plots for each value of k showing optimal vaccination strategies. The plots are saved in
+the `figures/sensitivity_k` directory.
+
+The `sensitivity_k.py` script must be run before this script to generate the underlying
+results.
+"""
+
 import pathlib
 import sys
 
@@ -13,6 +25,7 @@ from scripts.plotting import optimizing_vaccination_plots, plotting_utils
 
 
 def make_plots():
+    """Make and save the plots."""
     plotting_utils.set_sns_theme()
     color_palette = sns.color_palette("colorblind")
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/sensitivity_k"

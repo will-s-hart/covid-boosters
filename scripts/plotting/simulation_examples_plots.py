@@ -1,3 +1,13 @@
+"""
+Script to plot example simulations from illustrative analysis without vaccination.
+
+Plots of the incidence time series of a selection of simulations are generated and saved
+in the `figures/simulation_examples` directory.
+
+The `simulation_examples.py` script must be run before this script to generate the
+underlying results.
+"""
+
 import pathlib
 import sys
 
@@ -11,6 +21,7 @@ from scripts.plotting import plotting_utils
 
 
 def make_plots():
+    """Make and save the plots."""
     plotting_utils.set_sns_theme()
     results_dir = pathlib.Path(__file__).parents[2] / "results/simulation_examples"
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/simulation_examples"

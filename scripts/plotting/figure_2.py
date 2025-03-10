@@ -1,3 +1,5 @@
+"""Script to combine the panels of Figure 2 and save the figure in SVG format."""
+
 import pathlib
 import sys
 

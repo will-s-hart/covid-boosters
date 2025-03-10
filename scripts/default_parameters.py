@@ -1,3 +1,5 @@
+"""Module defining default parameters used in the analyses."""
+
 import functools
 import pathlib
 
@@ -11,6 +13,55 @@ results_dir = pathlib.Path(__file__).parents[1] / "results"
 
 
 def get_default_parameters():
+    """
+    Return a dictionary of default parameters.
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    default_parameters : dict
+        Dictionary of default parameters used in the analyses. The keys are:
+        - period: int
+            Period after which dynamics repeat
+        - unvaccinated_reproduction_no_mean: float
+            Temporal mean of the reproduction number before vaccination
+        - unvaccinated_reproduction_no_prop_variation: float
+            Proportion by which the reproduction number before vaccination varies from
+            its temporal mean
+        - peak_transmission_time: int
+            Time at which transmission peaks
+        - generation_time_dist: scipy.stats.rv_discrete
+            Discrete distribution of the generation time.
+        - dispersion_param: float
+            Dispersion parameter of the negative binomial offspring distribution.
+        - antibody_model_params_pop: dict
+            Dictionary of population median values of antibody model parameters. Keys
+            are as for the `params` argument of `covidboosters.AntibodyModel`.
+        - antibody_model_params_random_effects: dict
+            Dictionary of random effects of antibody model parameters.
+        - susceptibility_func_params: dict
+            Dictionary of parameters for the susceptibility function. Keys are as for
+            the `susceptibility_func_params` argument of
+            `covidboosters.IndividualSusceptibilityModel`.
+        - vaccination_time_range: list
+            Time range for vaccination in each period. Vaccines are distributed
+            uniformly in this range (excluding the right end point).
+        - proportion_vaccinated: float
+            Proportion of the population vaccinated in each period.
+        - population_size: int
+            Number of individuals to simulate antibody dynamics for in order to
+            calculate population susceptibility.
+        - sim_incidence_cutoff: int
+            Incidence threshold at/above which an outbreak is considered major when
+            calculating the outbreak risk via simulation.
+        - no_simulations: int
+            Number of simulations to run when calculating the outbreak risk via
+            simulation.
+
+    """
     period = 365
     unvacc_rep_no_mean = 2.5  # with below, max is 3
     unvacc_rep_no_prop_var = 0.2
@@ -69,6 +120,9 @@ def get_default_parameters():
 
 
 def _discretise_gt(gt_dist_cont, t_max):
+    # Helper function to discretise a continuous generation time distribution using
+    # the method of Cori et al., Am J Epidemiol, 2013
+
     def _integrand_fun(t, y):
         # To get probability mass function at time x, need to integrate this expression
         # with respect to y between y=x-1 and and y=x+1

@@ -1,3 +1,5 @@
+"""Script to plot the input generation time distribution."""
+
 import pathlib
 import sys
 
@@ -11,6 +13,7 @@ from scripts.plotting import plotting_utils
 
 
 def make_plots():
+    """Make and save the plot."""
     plotting_utils.set_sns_theme()
     figure_dir = pathlib.Path(__file__).parents[2] / "figures/model_input"
     figure_dir.mkdir(exist_ok=True, parents=True)
