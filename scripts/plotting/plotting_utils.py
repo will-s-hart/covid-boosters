@@ -1,6 +1,9 @@
+from math import ceil
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import svgutils.transform as svgt
 
 DEFAULTS = {
     "panel_sz": (340, 320),
