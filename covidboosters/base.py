@@ -1,6 +1,4 @@
-"""
-Base module defining main classes and methods.
-"""
+"""Base module defining classes and methods."""
 
 import numpy as np
 import pandas as pd
@@ -11,13 +9,44 @@ from scipy.stats import gamma, poisson
 
 class AntibodyModel:
     """
-    Class for modeling antibody dynamics following a single vaccination dose.
+    Class for modeling antibody dynamics following a single vaccine dose.
+
+    Parameters
+    ----------
+    params : dict
+        Dictionary of parameters for the antibody dynamics model with the following
+        keys: "mrna_dose", "mrna_decay_rate", "delay_to_antibody_response",
+        "max_antibody_production_rate", "mrna_response_steepness",
+        "half_maximal_response_mrna", "antibody_decay_rate".
+
     """
 
     def __init__(self, params):
+        """Initialize the antibody dynamics model."""
         self._params = params
 
     def run(self, time_init, antibody_init, time_vec, time_prev_vaccination=None):
+        """Run the model to calculate antibody dynamics following a vaccine dose.
+
+        Parameters
+        ----------
+        time_init : int
+            Time of vaccination.
+        antibody_init : float
+            Initial antibody titer prior to vaccination.
+        time_vec : array-like of int
+            Time points at which to calculate antibody titer.
+        time_prev_vaccination : int, optional
+            Time of the previous vaccination, if any (used for determining antibody
+            dynamics during the delay period before the antibody response to the current
+            vaccination).
+
+        Returns
+        -------
+        antibody_vec : array-like
+            Antibody titer at each time point in `time_vec`.
+
+        """
         params = self._params
         log_mrna_dose = np.log(params["mrna_dose"])
         mrna_decay_rate = params["mrna_decay_rate"]
@@ -27,7 +56,7 @@ class AntibodyModel:
         half_maximal_response_log_mrna = np.log(params["half_maximal_response_mrna"])
         antibody_decay_rate = params["antibody_decay_rate"]
 
-        def ode_func(t, y):
+        def _ode_func(t, y):
             antibody = y[0]
             if t - time_init < delay_to_antibody_response:
                 if time_prev_vaccination is not None:
@@ -52,7 +81,7 @@ class AntibodyModel:
             return [d_antibody_dt]
 
         ode_solution = solve_ivp(
-            ode_func,
+            _ode_func,
             t_span=(time_init, time_vec[-1]),
             y0=[antibody_init],
             t_eval=time_vec,
@@ -64,7 +93,21 @@ class AntibodyModel:
 
 class IndividualSusceptibilityModel:
     """
-    Class for calculating individual susceptibility based on an antibody dynamics model.
+    Individual susceptibility model.
+
+    Class for calculating individual susceptibility under (potentially) multiple
+    vaccine doses, based on an antibody dynamics model.
+
+    Parameters
+    ----------
+    vaccination_times : array-like of int, or None
+        Times of vaccination. If set to None, no vaccination is assumed.
+    antibody_model_params : dict
+        Dictionary of parameters for the antibody dynamics model (see `AntibodyModel`).
+    susceptibility_func_params : dict
+        Dictionary of parameters for the susceptibility function with the following
+        keys: "antibody_response_steepness", "half_protection_antibody".
+
     """
 
     def __init__(
@@ -73,6 +116,7 @@ class IndividualSusceptibilityModel:
         antibody_model_params,
         susceptibility_func_params,
     ):
+        """Initialize the individual susceptibility model."""
         if vaccination_times is None:
             vaccination_times = np.array([])
         else:
@@ -82,12 +126,27 @@ class IndividualSusceptibilityModel:
         self._antibody_model = AntibodyModel(antibody_model_params)
         self._susceptibility_func_params = susceptibility_func_params
 
-    def antibodies(self, time_vec):
+    def antibodies(self, time_vec, **_):
+        """
+        Calculate antibody titer over time.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate antibody titer.
+
+        Returns
+        -------
+        antibody_vec : array-like of float
+            Antibody titer at each time point in `time_vec`.
+
+        """
         antibody_model = self._antibody_model
         vaccination_times = self._vaccination_times
         vaccination_times = vaccination_times[vaccination_times <= np.max(time_vec)]
         antibody_vec = np.zeros(len(time_vec), dtype=float)
         antibody_init_next = 0.0
+        # Loop through times between vaccine doses
         for vaccination_index_current, vaccination_time_current in enumerate(
             vaccination_times
         ):
@@ -117,7 +176,21 @@ class IndividualSusceptibilityModel:
             antibody_vec[current_indicator_vec] = antibody_vec_current
         return antibody_vec
 
-    def susceptibility(self, time_vec, **kwargs):
+    def susceptibility(self, time_vec, **_):
+        """
+        Calculate susceptibility over time.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate susceptibility.
+
+        Returns
+        -------
+        susceptibility_vec : array-like of float
+            Susceptibility at each time point in `time_vec`.
+
+        """
         susceptibility_func_params = self._susceptibility_func_params
         antibody_response_steepness = susceptibility_func_params[
             "antibody_response_steepness"
@@ -125,7 +198,7 @@ class IndividualSusceptibilityModel:
         half_protection_antibody = susceptibility_func_params[
             "half_protection_antibody"
         ]
-        antibody_vec = self.antibodies(time_vec, **kwargs)
+        antibody_vec = self.antibodies(time_vec, **_)
         susceptibility_vec = 1 / (
             1 + (antibody_vec / half_protection_antibody) ** antibody_response_steepness
         )
@@ -134,8 +207,25 @@ class IndividualSusceptibilityModel:
 
 class PeriodicIndividualSusceptibilityModel(IndividualSusceptibilityModel):
     """
+    Individual susceptibility model in a periodic setting.
+
     Class for calculating individual susceptibility based on an antibody dynamics model
-    with periodic vaccination.
+    in a periodic setting.
+
+    Extends `IndividualSusceptibilityModel`.
+
+    Parameters
+    ----------
+    period : int
+        Period of repeating dynamics.
+    vaccination_times : array-like of int
+        Times of vaccination within each period.
+    antibody_model_params : dict
+        Dictionary of parameters for the antibody dynamics model (see `AntibodyModel`).
+    susceptibility_func_params : dict
+        Dictionary of parameters for the susceptibility function with the following
+        keys: "antibody_response_steepness", "half_protection_antibody".
+
     """
 
     def __init__(
@@ -145,6 +235,7 @@ class PeriodicIndividualSusceptibilityModel(IndividualSusceptibilityModel):
         antibody_model_params,
         susceptibility_func_params,
     ):
+        """Initialize the periodic individual susceptibility model."""
         super().__init__(
             vaccination_times=vaccination_times,
             antibody_model_params=antibody_model_params,
@@ -156,7 +247,25 @@ class PeriodicIndividualSusceptibilityModel(IndividualSusceptibilityModel):
             raise ValueError("Vaccination times must be between 0 and the period")
         self._period = period
 
-    def antibodies(self, time_vec, initial_periods=5):
+    def antibodies(self, time_vec, **kwargs):
+        """
+        Calculate antibody titer over time (after convergence to a periodic pattern).
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate antibody titer.
+        initial_periods : int, optional
+            Number of periods to simulate before time 0 to ensure convergence to a
+            periodic pattern. Default is 5.
+
+        Returns
+        -------
+        antibody_vec : array-like of float
+            Antibody titer at each time point in `time_vec`.
+
+        """
+        initial_periods = kwargs.get("initial_periods", 5)
         period = self._period
         vaccination_times = (
             self._vaccination_times
@@ -174,8 +283,43 @@ class PeriodicIndividualSusceptibilityModel(IndividualSusceptibilityModel):
 
 class PopulationSusceptibilityModel:
     """
+    Population susceptibility model.
+
     Class for simulating susceptibility under periodic booster vaccination in a
     population with heterogeneous antibody dynamics.
+
+    Parameters
+    ----------
+    period : int
+        Period of repeating dynamics.
+    vaccination_time_range : list of int, int, or None, optional
+        Time range for vaccination in each period. If a list, vaccines are distributed
+        uniformly within the range (excluding the right end point). If an int, all
+        vaccines are given at the single time point. If None (default), no vaccination
+        is assumed.
+    proportion_vaccinated : float, optional
+        Proportion of the population vaccinated each period. Default is 0.
+    antibody_model_params_pop : dict, optional
+        Dictionary of population median parameters for the antibody dynamics model.
+        Keys are as for the `params` argument of `AntibodyModel`. If not provided,
+        individuals are assumed to have constant susceptibility over time.
+    susceptibility_func_params : dict
+        Dictionary of parameters for the susceptibility function with the following
+        keys: "antibody_response_steepness", "half_protection_antibody".
+    antibody_model_params_random_effects : dict, optional
+        Dictionary of random effects on the antibody model parameters. Keys are the
+        same as for `antibody_model_params_pop`. If not provided, no random effects
+        are assumed.
+    population_size : int, optional
+        Number of individuals to simulate antibody dynamics for in order to calculate
+        population susceptibility. Default is 1.
+    rng : numpy.random.Generator, optional
+        Random number generator. If not provided, a new generator is created.
+    rng_seed : int, optional
+        Seed for the random number generator. Only used if `rng` is not provided. If
+        neither `rng` nor `rng_seed` are provided, a generator is created with default
+        settings.
+
     """
 
     def __init__(
@@ -199,7 +343,7 @@ class PopulationSusceptibilityModel:
             }
         if rng is None:
             rng = np.random.default_rng(rng_seed)
-        if isinstance(vaccination_time_range, (int, float)):
+        if np.issubdtype(type(vaccination_time_range), np.number):
             vaccination_time_range = [
                 vaccination_time_range,
                 vaccination_time_range + 1,
@@ -214,6 +358,7 @@ class PopulationSusceptibilityModel:
             self._susceptibility_vec_all_0_kwargs = None
             antibody_model_params_by_indiv = []
             for _ in range(population_size):
+                # Sample individual-specific antibody model parameters
                 antibody_model_params = {}
                 for param_name, param_pop in antibody_model_params_pop.items():
                     param_random_effect = antibody_model_params_random_effects[
@@ -230,6 +375,20 @@ class PopulationSusceptibilityModel:
             self._antibody_model_params_by_indiv = None
 
     def susceptibility(self, time_vec, **kwargs):
+        """
+        Calculate population susceptibility over time.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate susceptibility.
+
+        Returns
+        -------
+        susceptibility_vec : array-like of float
+            Susceptibility at each time point in `time_vec`.
+
+        """
         period = self._period
         time_vec_all = np.arange(period)
         susceptibility_vec_all = self._susceptibility_all(**kwargs)
@@ -241,6 +400,26 @@ class PopulationSusceptibilityModel:
     def update_vaccination_params(
         self, vaccination_time_range=None, proportion_vaccinated=None
     ):
+        """
+        Update time range of vaccination and/or proportion of vaccinated individuals.
+
+        This allows different vaccination strategies to be compared without needing to
+        resimulate individual antibody dynamics.
+
+        Parameters
+        ----------
+        vaccination_time_range : list of int, int, or None, optional
+            Time range for vaccination in each period (see class docstring for details).
+            If None, the current value is retained.
+        proportion_vaccinated : float, optional
+            Proportion of the population vaccinated each period. If None, the current
+            value is retained.
+
+        Returns
+        -------
+        None
+
+        """
         if vaccination_time_range is not None:
             if isinstance(vaccination_time_range, (int, float)):
                 vaccination_time_range = [
@@ -252,6 +431,25 @@ class PopulationSusceptibilityModel:
             self._proportion_vaccinated = proportion_vaccinated
 
     def save_susceptibility_all_0(self, file_path):
+        """
+        Save susceptibility values assuming all individuals are vaccinated at time 0.
+
+        Saves the population susceptibility values assuming all individuals are
+        vaccinated at time 0 to a CSV file. The susceptiblity values are calculated
+        before saving if necessary. Note that these values are then used to compare
+        different vaccination strategies without needing to store or resimulate
+        individual antibody dynamics.
+
+        Parameters
+        ----------
+        file_path : str
+            Path to the CSV file to save the susceptibility values to.
+
+        Returns
+        -------
+        None
+
+        """
         if self._susceptibility_vec_all_0 is None:
             self._calculate_susceptibility_all_0()
         time_vec_all = np.arange(self._period)
@@ -263,6 +461,26 @@ class PopulationSusceptibilityModel:
         susceptibility_all_0_df.to_csv(file_path)
 
     def load_susceptibility_all_0(self, file_path, kwargs_used=None):
+        """
+        Load susceptibility values assuming all individuals are vaccinated at time 0.
+
+        Loads the population susceptibility values assuming all individuals are
+        vaccinated at time 0 from a CSV file.
+
+        Parameters
+        ----------
+        file_path : str
+            Path to the CSV file to load the susceptibility values from.
+        kwargs_used : dict, optional
+            Keyword arguments that were used in the calculation of the susceptibility
+            values (i.e., keyword arguments passed to the last call to the
+            `susceptibility` method, if any).
+
+        Returns
+        -------
+        None
+
+        """
         susceptibility_all_0_df = pd.read_csv(file_path, index_col="time")
         if not np.array_equal(
             susceptibility_all_0_df.index.to_numpy(), np.arange(self._period)
@@ -274,6 +492,7 @@ class PopulationSusceptibilityModel:
         self._susceptibility_vec_all_0_kwargs = kwargs_used or {}
 
     def _susceptibility_all(self, **kwargs):
+        # Calculate population susceptibility at each time point in the period
         period = self._period
         vaccination_time_range = self._vaccination_time_range
         proportion_vaccinated = self._proportion_vaccinated
@@ -331,7 +550,18 @@ class PopulationSusceptibilityModel:
 
 class HeterogeneousRenewalModel:
     """
-    Base class for renewal models in hetergeneous populations.
+    Base class for generalised renewal models incorporating individual heterogeneity.
+
+    Parameters
+    ----------
+    reproduction_no_func : callable
+        Function that returns the reproduction number at each time point.
+    generation_time_dist : scipy.stats.rv_discrete
+        Discrete distribution of the generation time. Must have a finite support.
+    dispersion_param : float, optional
+        Dispersion parameter for the negative binomial offspring distribution. Default
+        is 1.0.
+
     """
 
     def __init__(
@@ -350,6 +580,33 @@ class HeterogeneousRenewalModel:
         rng=None,
         rng_seed=None,
     ):
+        """
+        Simulate an outbreak.
+
+        Parameters
+        ----------
+        time_start : int, optional
+            Time at which the outbreak starts. Default is 0.
+        incidence_start : int, optional
+            Incidence of new infections at time `time_start`. Default is 1.
+        incidence_cutoff : int, optional
+            Incidence threshold at which to stop the simulation. Default is 100.
+        rng : numpy.random.Generator, optional
+            Random number generator. If not provided, a new generator is created.
+        rng_seed : int, optional
+            Seed for the random number generator. Only used if `rng` is not provided. If
+            neither `rng` nor `rng_seed` are provided, a generator is created with
+            default settings.
+
+        Returns
+        -------
+        output : dict
+            Dictionary with keys "time_vec" (time points), "incidence_vec" (incidence
+            at each time point), and "outbreak_cutoff_indicator" (boolean indicating
+            whether the outbreak was stopped due to the incidence threshold being
+            reached).
+
+        """
         if rng is None:
             rng = np.random.default_rng(rng_seed)
         reproduction_no_func = self._reproduction_no_func
@@ -413,11 +670,37 @@ class HeterogeneousRenewalModel:
     def simulated_outbreak_risk(
         self,
         time_vec,
-        incidence_cutoff=1000,
-        no_simulations=1000,
-        rng=None,
-        rng_seed=None,
+        **kwargs,
     ):
+        """
+        Calculate the outbreak risk at each time point by simulating multiple outbreaks.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate the outbreak risk.
+        incidence_cutoff : int, optional
+            Incidence threshold above which an outbreak is considered major. Default is
+            100.
+        no_simulations : int, optional
+            Number of simulations to run at each time point. Default is 1000.
+        rng : numpy.random.Generator, optional
+            Random number generator. If not provided, a new generator is created.
+        rng_seed : int, optional
+            Seed for the random number generator. Only used if `rng` is not provided. If
+            neither `rng` nor `rng_seed` are provided, a generator is created with
+            default settings.
+
+        Returns
+        -------
+        outbreak_risk_vec : array-like of float
+            Outbreak risk at each time point in `time_vec`.
+
+        """
+        incidence_cutoff = kwargs.get("incidence_cutoff", 100)
+        no_simulations = kwargs.get("no_simulations", 1000)
+        rng = kwargs.get("rng", None)
+        rng_seed = kwargs.get("rng_seed", None)
         if rng is None:
             rng = np.random.default_rng(rng_seed)
         outbreak_risk_vec = np.zeros(len(time_vec))
@@ -440,12 +723,29 @@ class HeterogeneousRenewalModel:
         time_vec,
         **kwargs,
     ):
+        """
+        Calculate the instantaneous outbreak risk at each time point.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate the instantaneous outbreak risk.
+        **kwargs
+            Keyword arguments to pass to the `scipy.optimize.root` function used to
+            solve the nonlinear system satisfied by the outbreak risk values.
+
+        Returns
+        -------
+        outbreak_risk_vec : array-like of float
+            Instantaneous outbreak risk at each time point in `time_vec`.
+
+        """
         reproduction_no_func = self._reproduction_no_func
         dispersion_param = self._dispersion_param
         reproduction_no_vec = reproduction_no_func(time_vec)
         multiplying_matrix = np.diag(reproduction_no_vec)
 
-        def zero_func(outbreak_risk_vec):
+        def _zero_func(outbreak_risk_vec):
             return (
                 1
                 - outbreak_risk_vec
@@ -459,7 +759,7 @@ class HeterogeneousRenewalModel:
 
         outbreak_risk_vec_init = np.ones(len(time_vec))
         outbreak_risk_vec = root(
-            zero_func,
+            _zero_func,
             x0=outbreak_risk_vec_init,
             **kwargs,
         ).x
@@ -468,7 +768,22 @@ class HeterogeneousRenewalModel:
 
 class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
     """
-    Class for renewal models in hetergeneous populations with periodic transmission.
+    Periodic generalised renewal model incorporating individual heterogeneity.
+
+    Extends `HeterogeneousRenewalModel`.
+
+    Parameters
+    ----------
+    time_vec : array-like of int
+        Array of consecutive integers defining all time points over a single period.
+    reproduction_no_vec : array-like of float
+        Array of reproduction numbers at each time point in `time_vec`.
+    generation_time_dist : scipy.stats.rv_discrete
+        Discrete distribution of the generation time. Must have a finite support.
+    dispersion_param : float, optional
+        Dispersion parameter for the negative binomial offspring distribution. Default
+        is 1.0.
+
     """
 
     def __init__(
@@ -487,6 +802,23 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
         self._reproduction_no_vec = reproduction_no_vec
 
     def case_outbreak_risk(self, time_vec, **kwargs):
+        """
+        Calculate the outbreak risk at each time point.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate the outbreak risk.
+        **kwargs
+            Keyword arguments to pass to the `scipy.optimize.root` function used to
+            solve the nonlinear system satisfied by the outbreak risk values.
+
+        Returns
+        -------
+        outbreak_risk_vec : array-like of float
+            Outbreak risk at each time point in `time_vec`.
+
+        """
         time_vec_all = self._time_vec
         period = self._period
         outbreak_risk_vec_all = self._case_outbreak_risk_all(**kwargs)
@@ -496,6 +828,34 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
         return outbreak_risk_vec
 
     def simulated_outbreak_risk(self, time_vec, **kwargs):
+        """
+        Calculate the outbreak risk at each time point by simulating multiple outbreaks.
+
+        Overrides the method in the base class to avoid recalculating the outbreak risk
+        after multiples of the period.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate the outbreak risk.
+        incidence_cutoff : int, optional
+            Incidence threshold at/above which an outbreak is considered major. Default
+            is 100.
+        no_simulations : int, optional
+            Number of simulations to run at each time point. Default is 1000.
+        rng : numpy.random.Generator, optional
+            Random number generator. If not provided, a new generator is created.
+        rng_seed : int, optional
+            Seed for the random number generator. Only used if `rng` is not provided. If
+            neither `rng` nor `rng_seed` are provided, a generator is created with
+            default settings.
+
+        Returns
+        -------
+        outbreak_risk_vec : array-like of float
+            Outbreak risk at each time point in `time_vec`.
+
+        """
         period = self._period
         time_vec_reduced = np.unique(time_vec % period)
         outbreak_risk_vec_reduced = super().simulated_outbreak_risk(
@@ -507,6 +867,7 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
         return outbreak_risk_vec
 
     def _case_outbreak_risk_all(self, **kwargs):
+        # Calculate the outbreak risk at each time point in the period
         reproduction_no_vec = self._reproduction_no_vec
         generation_time_dist = self._generation_time_dist
         dispersion_param = self._dispersion_param
@@ -531,7 +892,7 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
             )
         multiplying_matrix = np.matmul(multiplying_matrix, np.diag(reproduction_no_vec))
 
-        def zero_func(outbreak_risk_vec):
+        def _zero_func(outbreak_risk_vec):
             return (
                 1
                 - outbreak_risk_vec
@@ -545,7 +906,7 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
 
         outbreak_risk_vec_init = np.ones(period)
         outbreak_risk_vec = root(
-            zero_func,
+            _zero_func,
             x0=outbreak_risk_vec_init,
             **kwargs,
         ).x
@@ -555,6 +916,51 @@ class PeriodicHeterogeneousRenewalModel(HeterogeneousRenewalModel):
 class OutbreakRiskModel:
     """
     Class for outbreak risk calculations with periodic transmission and vaccination.
+
+    Parameters
+    ----------
+    period : int
+        Period of repeating dynamics.
+    unvaccinated_reproduction_no_mean : float
+        Temporal mean of the reproduction number before vaccination (which is assumed
+        to follow a sinusoidal pattern).
+    unvaccinated_reproduction_no_prop_variation : float
+        Proportion by which the reproduction number before vaccination varies from its
+        temporal mean.
+    peak_transmission_time : int
+        Time at which the reproduction number before vaccination peaks (in the period).
+    generation_time_dist : scipy.stats.rv_discrete
+        Discrete distribution of the generation time. Must have a finite support.
+    dispersion_param : float
+        Dispersion parameter for the negative binomial offspring distribution.
+    vaccination_time_range : list of int, int, or None, optional
+        Time range for vaccination in each period. If a list, vaccines are distributed
+        uniformly within the range (excluding the right end point). If an int, all
+        vaccines are given at the single time point. If None (default), no vaccination
+        is assumed.
+    proportion_vaccinated : float, optional
+        Proportion of the population vaccinated each period. Default is 0.
+    antibody_model_params_pop : dict, optional
+        Dictionary of population median parameters for the antibody dynamics model.
+        Keys are as for the `params` argument of `AntibodyModel`. If not provided,
+        individuals are assumed to have constant susceptibility over time.
+    susceptibility_func_params : dict
+        Dictionary of parameters for the susceptibility function with the following
+        keys: "antibody_response_steepness", "half_protection_antibody".
+    antibody_model_params_random_effects : dict, optional
+        Dictionary of random effects on the antibody model parameters. Keys are the
+        same as for `antibody_model_params_pop`. If not provided, no random effects
+        are assumed.
+    population_size : int, optional
+        Number of individuals to simulate antibody dynamics for in order to calculate
+        population susceptibility. Default is 1.
+    rng : numpy.random.Generator, optional
+        Random number generator. If not provided, a new generator is created.
+    rng_seed : int, optional
+        Seed for the random number generator. Only used if `rng` is not provided. If
+        neither `rng` nor `rng_seed` are provided, a generator is created with default
+        settings.
+
     """
 
     def __init__(
@@ -603,6 +1009,20 @@ class OutbreakRiskModel:
         self._renewal_model = None
 
     def reproduction_no(self, time_vec):
+        """
+        Calculate the reproduction number at the specified time points.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate the reproduction number.
+
+        Returns
+        -------
+        reproduction_no_vec : array-like of float
+            Reproduction number at each time point in `time_vec`.
+
+        """
         if self._renewal_model is None:
             self._build_renewal_model()
         time_vec_all = self._time_vec
@@ -614,6 +1034,21 @@ class OutbreakRiskModel:
         return reproduction_no_vec
 
     def unvaccinated_reproduction_no(self, time_vec):
+        """
+        Calculate the reproduction number without vaccination at the specified time points.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate the reproduction number.
+
+        Returns
+        -------
+        unvaccinated_reproduction_no_vec : array-like of float
+            Reproduction number in the absence of vaccination at each time point in
+            `time_vec`.
+
+        """
         if self._renewal_model is None:
             self._build_renewal_model()
         time_vec_all = self._time_vec
@@ -625,6 +1060,20 @@ class OutbreakRiskModel:
         return unvaccinated_reproduction_no_vec
 
     def susceptibility(self, time_vec):
+        """
+        Calculate population average susceptibility at the specified time points.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate susceptibility.
+
+        Returns
+        -------
+        susceptibility_vec : array-like of float
+            Susceptibility at each time point in `time_vec`.
+
+        """
         if self._renewal_model is None:
             self._build_renewal_model()
         time_vec_all = self._time_vec
@@ -636,16 +1085,67 @@ class OutbreakRiskModel:
         return susceptibility_vec
 
     def case_outbreak_risk(self, time_vec, **kwargs):
+        """
+        Calculate the outbreak risk at the specified time points.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate the outbreak risk.
+        **kwargs
+            Keyword arguments to pass to the `scipy.optimize.root` function used to
+            solve the nonlinear system satisfied by the outbreak risk values.
+
+        Returns
+        -------
+        outbreak_risk_vec : array-like of float
+            Outbreak risk at each time point in `time_vec`.
+
+        """
         if self._renewal_model is None:
             self._build_renewal_model()
         return self._renewal_model.case_outbreak_risk(time_vec, **kwargs)
 
     def instantaneous_outbreak_risk(self, time_vec, **kwargs):
+        """
+        Calculate the instantaneous outbreak risk at the specified time points.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate the instantaneous outbreak risk.
+
+        Returns
+        -------
+        outbreak_risk_vec : array-like of float
+            Instantaneous outbreak risk at each time point in `time_vec`.
+
+        """
         if self._renewal_model is None:
             self._build_renewal_model()
         return self._renewal_model.instantaneous_outbreak_risk(time_vec, **kwargs)
 
     def simulated_outbreak_risk(self, time_vec, **kwargs):
+        """
+        Calculate the outbreak risk at the specified time points via simulation.
+
+        Parameters
+        ----------
+        time_vec : array-like of int
+            Time points at which to calculate the outbreak risk.
+        incidence_cutoff : int, optional
+            Incidence threshold at/above which an outbreak is considered major. Default
+            is 100.
+        no_simulations : int, optional
+            Number of simulations to run at each time point. Default is 1000.
+        rng : numpy.random.Generator, optional
+            Random number generator. If not provided, a new generator is created.
+        rng_seed : int, optional
+            Seed for the random number generator. Only used if `rng` is not provided. If
+            neither `rng` nor `rng_seed` are provided, a generator is created with
+            default settings.
+
+        """
         rng = self._rng
         if self._renewal_model is None:
             self._build_renewal_model()
@@ -656,6 +1156,26 @@ class OutbreakRiskModel:
     def update_vaccination_params(
         self, vaccination_time_range=None, proportion_vaccinated=None
     ):
+        """
+        Update time range of vaccination and/or proportion of vaccinated individuals.
+
+        This allows different vaccination strategies to be compared without needing to
+        resimulate individual antibody dynamics.
+
+        Parameters
+        ----------
+        vaccination_time_range : list of int, int, or None, optional
+            Time range for vaccination in each period (see class docstring for details).
+            If None, the current value is retained.
+        proportion_vaccinated : float, optional
+            Proportion of the population vaccinated each period. If None, the current
+            value is retained.
+
+        Returns
+        -------
+        None
+
+        """
         self._susceptibility_model.update_vaccination_params(
             vaccination_time_range=vaccination_time_range,
             proportion_vaccinated=proportion_vaccinated,
@@ -665,12 +1185,51 @@ class OutbreakRiskModel:
         self._renewal_model = None
 
     def save_susceptibility_all_0(self, file_path):
+        """
+        Save susceptibility values assuming all individuals are vaccinated at time 0.
+
+        Saves the population susceptibility values assuming all individuals are
+        vaccinated at time 0 to a CSV file. The susceptiblity values are calculated
+        before saving if necessary. Note that these values are then used to compare
+        different vaccination strategies without needing to store or resimulate
+        individual antibody dynamics.
+
+        Parameters
+        ----------
+        file_path : str
+            Path to the CSV file to save the susceptibility values to.
+
+        Returns
+        -------
+        None
+
+        """
         self._susceptibility_model.save_susceptibility_all_0(file_path)
 
-    def load_susceptibility_all_0(self, file_path, kwargs_used=None):
-        self._susceptibility_model.load_susceptibility_all_0(file_path, kwargs_used)
+    def load_susceptibility_all_0(self, file_path):
+        """
+        Load susceptibility values assuming all individuals are vaccinated at time 0.
+
+        Loads the population susceptibility values assuming all individuals are
+        vaccinated at time 0 from a CSV file.
+
+        Parameters
+        ----------
+        file_path : str
+            Path to the CSV file to load the susceptibility values from.
+
+        Returns
+        -------
+        None
+
+        """
+        self._susceptibility_model.load_susceptibility_all_0(
+            file_path, kwargs_used=None
+        )
 
     def _build_renewal_model(self):
+        # Helper method to compute the susceptibility and reproduction number values
+        # under vaccination and create a PeriodicHeterogeneousRenewalModel object
         time_vec = self._time_vec
         unvaccinated_reproduction_no_vec = self._unvaccinated_reproduction_no_vec
         generation_time_dist = self._generation_time_dist
