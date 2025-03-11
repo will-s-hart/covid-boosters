@@ -12,6 +12,7 @@ import sys
 
 import numpy as np
 import pandas as pd
+import tqdm
 
 sys.path.insert(1, str(pathlib.Path(__file__).parents[1]))
 
@@ -54,7 +55,8 @@ def run_analyses(
     time_vec = np.arange(period)
     log10_antibodies_mat = np.zeros((period, population_size))
     susceptibility_mat = np.zeros((period, population_size))
-    for individual_no in range(population_size):
+    print(f"Running the within-host model for {population_size} individuals")
+    for individual_no in tqdm.tqdm(range(population_size)):
         antibody_model_params = {}
         for param_name, param_pop in antibody_model_params_pop.items():
             param_random_effect = antibody_model_params_random_effects[param_name]
