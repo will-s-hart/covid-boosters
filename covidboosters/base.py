@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import tqdm
 from scipy.integrate import solve_ivp
 from scipy.optimize import root
 from scipy.stats import gamma, poisson
@@ -704,6 +705,7 @@ class HeterogeneousRenewalModel:
         if rng is None:
             rng = np.random.default_rng(rng_seed)
         outbreak_risk_vec = np.zeros(len(time_vec))
+        pbar = tqdm.tqdm(total=len(time_vec) * no_simulations)
         for i, time in enumerate(time_vec):
             major_outbreak_indicator_vec = np.zeros(no_simulations, dtype=bool)
             for j in range(no_simulations):
@@ -714,8 +716,10 @@ class HeterogeneousRenewalModel:
                     rng=rng,
                 )
                 major_outbreak_indicator_vec[j] = output["outbreak_cutoff_indicator"]
+                pbar.update()
             outbreak_risk = major_outbreak_indicator_vec.mean()
             outbreak_risk_vec[i] = outbreak_risk
+        pbar.close()
         return outbreak_risk_vec
 
     def instantaneous_outbreak_risk(
