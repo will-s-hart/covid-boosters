@@ -157,6 +157,7 @@ def _run_optimization(
     )
     # Refine the search
     if refine and grid_step > 1:
+        print("Refining the search")
         start_time_grid_vals_refine = np.arange(
             start_time_best - grid_step, start_time_best + grid_step + 1
         )
