@@ -184,7 +184,7 @@ rule supp_fig_svg_to_png:
 
 rule format_antibody_model_param_estimates:
     input:
-        "data/12HCWs_parameters.csv",
+        "data/12_HCWs_parameters.csv",
         "data/1618_FukushimaVaccineCohort_parameters.csv",
     output:
         "results/antibody_model_params.csv",
