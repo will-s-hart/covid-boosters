@@ -71,7 +71,7 @@ def run_analyses():
         df_analytic[f"{dispersion_param}"] = (
             outbreak_risk_model_curr.case_outbreak_risk(time_vec)
         )
-        print(f"Running {kwargs_sor['no_simulations']} simulations...")
+        print(f"Running {kwargs_sor['no_simulations']} simulations at each time point")
         df_simulated[f"{dispersion_param}"] = (
             outbreak_risk_model_curr.simulated_outbreak_risk(time_vec_sor, **kwargs_sor)
         )
