@@ -1,6 +1,6 @@
 # covid-boosters
 Python code accompanying the manuscript "Effects of individual variation and seasonal
-vaccination on disease risks by Hart *et al.*"
+vaccination on disease risks" by Hart *et al*.
 
 To reproduce the figures, we recommend using `conda` to create a virtual environment
 named 'covidboosters' with the required dependencies specified in `environment.yml`:
