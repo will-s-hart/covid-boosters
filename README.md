@@ -1,5 +1,6 @@
-# covid-boosters
-Python code accompanying the manuscript "Effects of individual variation and seasonal
+[![DOI](https://zenodo.org/badge/776044303.svg)](https://doi.org/10.5281/zenodo.15800215)
+
+Data and Python code accompanying the manuscript "Effects of individual variation and seasonal
 vaccination on disease risks" by Hart *et al*.
 
 To reproduce the figures, we recommend using `conda` to create a virtual environment
