@@ -130,7 +130,9 @@ def make_figure(
         panel.moveto(position[0], position[1], scale_x=scaling)
     # add text labels
     labels = [
-        svgt.TextElement(position[0], position[1], string, size=label_size)
+        svgt.TextElement(
+            position[0], position[1], string, size=label_size, font="Arial"
+        )
         for string, position in zip(label_strings, label_positions)
     ]
     # append plots and labels to figure
@@ -167,6 +169,8 @@ def set_sns_theme():
         "xtick.labelsize": 16,
         "ytick.labelsize": 16,
         "legend.fontsize": 14,
+        "font.family": "sans-serif",
+        "font.sans-serif": "Arial",
     }
     sns.set_theme(style="ticks", palette="colorblind", rc=rc_params)
 
