@@ -1,7 +1,8 @@
 [![DOI](https://zenodo.org/badge/776044303.svg)](https://doi.org/10.5281/zenodo.15800215)
 
-Data and Python code accompanying the manuscript "Effects of individual variation and
-seasonal vaccination on disease risks" by Hart *et al*.
+Data and Python code accompanying Hart *et al*., "Effects of individual variation and
+seasonal vaccination on disease risks", *Nature Communications*, 2025
+(https://doi.org/10.1038/s41467-025-63375-5).
 
 To reproduce the figures, we recommend using `conda` to create a virtual environment
 named 'covidboosters' with the required dependencies specified in `environment.yml`
